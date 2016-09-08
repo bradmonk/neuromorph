@@ -18,7 +18,7 @@ datadate = '';
 %% MANUALLY SET PER-SESSION PATH PARAMETERS IF WANTED
 
 
-datadir = '/Users/bradleymonk/Documents/MATLAB/myToolbox/LAB/FRET_FLIM/FRETdata/Organotypic/DIV15/';
+datadir = '/Users/bradleymonk/Documents/MATLAB/myToolbox/LAB/neuromorph/neuromorphdata/organotypic/DIV11/';
 % datafile = 'Intensity Image of slice3-n5z6.bmp';
 datadate = '20160902';
 
