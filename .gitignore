@@ -1,19 +1,17 @@
-# Build and Release Folders
-bin/
-bin-debug/
-bin-release/
-[Oo]bj/ # FlashDevelop obj
-[Bb]in/ # FlashDevelop bin
+# OS X temporary files
+.DS_Store
+*.m~
+# *.mat
+*.aux
+*.log
+*.out
+*.txt
 
-# Other files and folders
-.settings/
-
-# Executables
-*.swf
-*.air
-*.ipa
-*.apk
-
-# Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
-# should NOT be excluded as they contain compiler settings and other important
-# information for Eclipse / Flash Builder.
+# Explicitly ignore some folders
+testdata
+testdata/*
+gcdata
+gcdata/*
+archive
+gcdat
+gcdat/*
