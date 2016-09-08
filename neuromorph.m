@@ -1,28 +1,94 @@
 function varargout = neuromorph(varargin)
+%% neuromorph.m - NEURON MORPHOLOGY TOOLBOX
+%{
+% 
+% Syntax
+% -----------------------------------------------------
+%     neuromorph()
+% 
+% 
+% Description
+% -----------------------------------------------------
+% 
+%     neuromorph() is run with no arguments passed in. The user
+%     will be prompted to select a directory which contains the image data
+%     tif stack along with the corresponding xls file.
+%     
+% 
+% Useage Definitions
+% -----------------------------------------------------
+% 
+%     neuromorph()
+%         launches a GUI to process image stack data from GRIN lens
+%         experiments
+%  
+% 
+% 
+% Example
+% -----------------------------------------------------
+% 
+%     TBD
+% 
+% 
+% See Also
+% -----------------------------------------------------
+% >> web('http://bradleymonk.com/neuromorph')
+% >> web('http://imagej.net/Miji')
+% >> web('http://bigwww.epfl.ch/sage/soft/mij/')
+% 
+% 
+% Attribution
+% -----------------------------------------------------
+% % Created by: Bradley Monk
+% % email: brad.monk@gmail.com
+% % website: bradleymonk.com
+% % 2016.07.04
+%}
+%----------------------------------------------------
 
 %% ESTABLISH STARTING PATHS
+clc; close all; clear all; clear java;
+% clearvars -except varargin
+disp('WELCOME TO NEUROMORPH - A NEURON MORPHOLOGY TOOLBOX')
+% set(0,'HideUndocumented','off')
 
-clc; close all; clearvars -except datadir
-disp('clearing matlab workspace');
-
-thisfile = mfilename;
+global thisfilepath
+thisfile = 'neuromorph.m';
 thisfilepath = fileparts(which(thisfile));
+cd(thisfilepath);
 
+fprintf('\n\n Current working path set to: \n % s \n', thisfilepath)
+
+% global isbrad
+% upath = userpath;
+% isbrad = strcmp('/Users/bradleymonk',upath(1:18));
+    
+    pathdir0 = thisfilepath;
+    pathdir1 = [thisfilepath '/neuromorphdata'];
+    
+    gpath = [pathdir0 ':' pathdir1];
+    
+    addpath(gpath)
+
+fprintf('\n\n Added folders to path: \n % s \n % s \n % s \n % s \n\n',...
+        pathdir0,pathdir1)
+
+
+
+
+%% MANUALLY SET PER-SESSION PATH PARAMETERS IF WANTED
 
 global datadir datafile datadate
 datadir = '';
 datafile = '';
 datadate = '';
 
-
-%% MANUALLY SET PER-SESSION PATH PARAMETERS IF WANTED
-
-
-datadir = '/Users/bradleymonk/Documents/MATLAB/myToolbox/LAB/neuromorph/neuromorphdata/organotypic/DIV11/';
+datadir = '/Users/bradleymonk/Documents/MATLAB/myToolbox/LAB/neuromorph/neuromorphdata/organotypic/DIV11/2016_08_30/';
 % datafile = 'Intensity Image of slice3-n5z6.bmp';
 datadate = '20160902';
 
-
+global imgpath
+imgpath = '';
 
 %% CD TO DATA DIRECTORY
 
@@ -40,8 +106,20 @@ if numel(datafile) < 1
     datafile = uigetfile('*.bmp');
 end
 
+imgpath = [datadir datafile];
+
 
 %% ESTABLISH GLOBALS AND SET STARTING VALUES
+
+global IMG DENDRITE SPINE SPINEHN
+IMG = [];
+
+global haxPRE
+
+
+
+
+
 
 global LifeImageFile FLIMcmap
 global intenseThreshMIN intenseThreshMAX intenseThreshPMIN intenseThreshPMAX
@@ -94,11 +172,11 @@ dVOL = 1;
 % imYlim = [];
 
 
-global flimdats ccmap cmmap imgC phCCD
+global flimdats ccmap cmmap phCCD
 flimdats = {};
 ccmap = [];
 cmmap = [];
-imgC = [];
+
 
 
 global boxtype
@@ -106,24 +184,10 @@ boxtype = 'freehand'; % freehand:1  rectangle:2  elipse:3
 
 
 
+%########################################################################
+%%              MAIN ANALYSIS GUI WINDOW SETUP 
+%########################################################################
 
-
-
-
-
-%% INITIATE GUI HANDLES AND CREATE GUI FIGURE
-
-%Initialization code. Function creates a datastack variable for storing the
-%files. It then displays the initial menu options - to compile a file or to
-%load a file. Also sets up lifetime image and intensity image windows -
-%these are set to invisible unless the 'load file' button is selected.
-
-
-% ----- INITIAL SUBMENU GUI SETUP (LOAD DATA ~ COMPILE DATA) -----
-
-
-
-% ----- MAIN FLIM ANALYSIS GUI WINDOW SETUP -----
 
 % mainguih.CurrentCharacter = '+';
 mainguih = figure('Units', 'normalized','Position', [.1 .1 .8 .8], 'BusyAction',...
@@ -131,22 +195,44 @@ mainguih = figure('Units', 'normalized','Position', [.1 .1 .8 .8], 'BusyAction',
     'KeyPressFcn', {@keypresszoom,1});
 
 haxCCD = axes('Parent', mainguih, 'NextPlot', 'Add',...
-    'Position', [0.05 0.15 0.7 0.7], 'OuterPosition', [-.08 0 .8 1],...
-    'PlotBoxAspectRatio', [1024/768 1 1],'XColor','none','YColor','none'); 
+    'Position', [0.01 0.01 0.60 0.95], 'PlotBoxAspectRatio', [1 1 1], ...
+    'XColor','none','YColor','none'); 
 
-% ----- FLIM ANALYSIS GUI PARAMETER BOXES -----
 
-boxidh = uicontrol('Parent', mainguih, 'Style', 'Edit', 'Units', 'normalized', ...
-    'Position', [0.88 0.92 0.06 0.04], 'FontSize', 11); 
-boxidselecth = uicontrol('Parent', mainguih, 'Units', 'normalized', ...
-    'Position', [0.70 0.92 0.12 0.04], 'FontSize', 11, 'String', 'ROI ID',...
+
+
+cmapsliderH = uicontrol('Parent', mainguih, 'Units', 'normalized','Style','slider',...
+	'Max',50,'Min',1,'Value',10,'SliderStep',[.1 .2],...
+	'Position', [0.01 0.96 0.60 0.03], 'Callback', @cmapslider);
+
+
+
+haxPRE = axes('Parent', mainguih, 'NextPlot', 'replacechildren',...
+    'Position', [0.63 0.03 0.3 0.25]); 
+
+axes(haxCCD)
+
+
+
+%----------------------------------------------------
+%           IMAGE PROCESSING PANEL
+%----------------------------------------------------
+IPpanelH = uipanel('Title','Image Processing','FontSize',10,...
+    'BackgroundColor',[.95 .95 .95],...
+    'Position', [0.62 0.65 0.30 0.30]); % 'Visible', 'Off',
+
+
+boxidh = uicontrol('Parent', IPpanelH, 'Style', 'Edit', 'Units', 'normalized', ...
+    'Position', [0.55 0.80 0.40 0.15], 'FontSize', 11); 
+boxidselecth = uicontrol('Parent', IPpanelH, 'Units', 'normalized', ...
+    'Position', [0.05 0.80 0.40 0.15], 'FontSize', 11, 'String', 'SPINE ID',...
     'Callback', @getROI); 
 
 
 
-boxtypeh = uibuttongroup('Parent', mainguih, 'Visible','off',...
+boxtypeh = uibuttongroup('Parent', IPpanelH, 'Visible','off',...
                   'Units', 'normalized',...
-                  'Position',[0.70 0.85 0.25 0.05],...
+                  'Position',[0.05 0.55 0.90 0.20],...
                   'SelectionChangedFcn',@boxselection);
               
 % Create three radio buttons in the button group.
@@ -170,91 +256,130 @@ boxtypeh3 = uicontrol(boxtypeh,'Style','radiobutton',...
 boxtypeh.Visible = 'on';
 
 
-resetROISh = uicontrol('Parent', mainguih, 'Units', 'normalized', ...
-    'Position', [0.70 0.79 0.12 0.04], 'String', 'Reset all ROIs', 'FontSize', 11,...
+resetROISh = uicontrol('Parent', IPpanelH, 'Units', 'normalized', ...
+    'Position', [0.05 0.10 0.40 0.15], 'String', 'Reset all ROIs', 'FontSize', 11,...
     'Callback', @resetROIS);
 
 
 
-setintenh = uicontrol('Parent', mainguih, 'Units', 'normalized', ...
-    'Position', [0.70 0.72 0.12 0.04], 'FontSize', 11, 'String', 'Set intensity',...
-    'Callback', @setinten);
-
-
-dftintenh = uicontrol('Parent', mainguih, 'Units', 'normalized', ...
-    'Position', [0.85 0.72 0.12 0.04], 'FontSize', 11,...
-    'String', 'Default intensities','Callback', @defaultinten);
-
-
-intThreshMinh = uicontrol('Parent', mainguih, 'Style', 'Text', 'Units', 'normalized', ...
-    'Position', [0.70 0.668 0.12 0.04], 'FontSize', 11, 'String', 'Min Intensity');
-intThreshMin = uicontrol('Parent', mainguih, 'Style', 'Edit', 'FontSize', 11, 'Units', 'normalized', ...
-    'Position', [0.70 0.64 0.12 0.04]);
-
-intThreshMaxh = uicontrol('Parent', mainguih, 'Style', 'Text', 'Units', 'normalized', ...
-    'Position', [0.85 0.668 0.12 0.04], 'FontSize', 11, 'String', 'Max Intensity');
-intThreshMax = uicontrol('Parent', mainguih, 'Style', 'Edit', 'FontSize', 11, 'Units', 'normalized', ...
-    'Position', [0.85 0.64 0.12 0.04]);
-
-
-lifetimethresholdh = uicontrol('Parent', mainguih, 'Style', 'Text',  'Units', 'normalized',...
-    'Position', [0.70 0.49 0.12 0.04], 'FontSize', 11, 'String', 'Lifetime Min');
-lftthresholdMINh = uicontrol('Parent', mainguih, 'Style', 'Edit',  'Units', 'normalized',...
-    'Position', [0.70 0.46 0.12 0.04], 'FontSize', 11);
-
-
-lifetimethreshMAXh = uicontrol('Parent', mainguih, 'Style', 'Text',  'Units', 'normalized',...
-    'Position', [0.85 0.49 0.12 0.04], 'FontSize', 11, 'String', 'Lifetime Max');
-lftthresholdMAXh = uicontrol('Parent', mainguih, 'Style', 'Edit',  'Units', 'normalized',...
-    'Position', [0.85 0.46 0.12 0.04], 'FontSize', 11);
-
-
-
-chithresholdminh = uicontrol('Parent', mainguih, 'Style', 'Text',  'Units', 'normalized',...
-    'Position', [0.70 0.33 0.12 0.04], 'FontSize', 11, 'String', 'Chi Min');
-chiminh = uicontrol('Parent', mainguih, 'Style', 'Edit',  'Units', 'normalized', ...
-    'Position', [0.70 0.30 0.12 0.04], 'FontSize', 11);
-
-
-chithresholdmaxh = uicontrol('Parent', mainguih, 'Style', 'Text',  'Units', 'normalized', ...
-    'Position', [0.85 0.33 0.12 0.04], 'FontSize', 11, 'String', 'Chi Max');
-chimaxh = uicontrol('Parent', mainguih, 'Style', 'Edit',  'Units', 'normalized', ...
-    'Position', [0.85 0.30 0.12 0.04], 'FontSize', 11);
-
-
-magnifh = uicontrol('Parent', mainguih, 'Style', 'Text',  'Units', 'normalized', ...
-    'Position', [0.70 0.58 0.12 0.04], 'FontSize', 11, 'String', 'Magnification');
-magh = uicontrol('Parent', mainguih, 'Style', 'Edit',  'Units', 'normalized', ...
-    'Position', [0.70 0.555 0.12 0.04], 'FontSize', 11);
-
-
-dendszh = uicontrol('Parent', mainguih, 'Units', 'normalized', ...
-    'Position', [0.85 0.56 0.12 0.04], 'String', 'Get Dendrite Size', 'FontSize', 11,...
+dendszh = uicontrol('Parent', IPpanelH, 'Units', 'normalized', ...
+    'Position', [0.55 0.10 0.40 0.15], 'String', 'Get Dendrite Size', 'FontSize', 11,...
     'Callback', @getdendsize);
 
 
 
-lifetimeviewerh = uicontrol('Parent', mainguih, 'Units', 'normalized', ...
-    'Position', [0.70 0.20 0.24 0.04], 'String', 'Explore Image', 'FontSize', 11,...
+
+
+%----------------------------------------------------
+%           DATA I/O PANEL
+%----------------------------------------------------
+IOpanelH = uipanel('Title','Data I/O ','FontSize',10,...
+    'BackgroundColor',[.95 .95 .95],...
+    'Position', [0.62 0.35 0.30 0.30]); % 'Visible', 'Off',
+
+lifetimeviewerh = uicontrol('Parent', IOpanelH, 'Units', 'normalized', ...
+    'Position', [0.05 0.80 0.40 0.15], 'String', 'Explore Image', 'FontSize', 11,...
     'Callback', @lifetimeviewer);
 
 
-closeimagesh = uicontrol('Parent', mainguih, 'Units', 'normalized', ...
-    'Position', [0.70 0.13 0.24 0.04], 'FontSize', 11, 'String', 'Close Windows',...
+closeimagesh = uicontrol('Parent', IOpanelH, 'Units', 'normalized', ...
+    'Position', [0.55 0.80 0.40 0.15], 'FontSize', 11, 'String', 'Close Windows',...
     'Callback', @closelftintenw);
 
 
-savefileh = uicontrol('Parent', mainguih, 'Units', 'normalized', ...
-    'Position', [0.70 0.06 0.24 0.04], 'String', 'Save File', 'FontSize', 11,...
+savefileh = uicontrol('Parent', IOpanelH, 'Units', 'normalized', ...
+    'Position', [0.05 0.50 0.90 0.25], 'String', 'Save File', 'FontSize', 11,...
     'Callback', @saveFile);
+
+
+
+
+
+%----------------------------------------------------
+%     IMPORT IMAGE & LOAD DEFAULT TOOLBOX PARAMETERS
+%----------------------------------------------------
 
 loadfile()
 
 
 
 
-% -----------------------------------------------------------------
-%% GUI TOOLBOX FUNCTIONS
+
+%{
+% setintenh = uicontrol('Parent', mainguih, 'Units', 'normalized', ...
+%     'Position', [0.70 0.72 0.12 0.04], 'FontSize', 11, 'String', 'Set intensity',...
+%     'Callback', @setinten);
+% 
+% 
+% dftintenh = uicontrol('Parent', mainguih, 'Units', 'normalized', ...
+%     'Position', [0.85 0.72 0.12 0.04], 'FontSize', 11,...
+%     'String', 'Default intensities','Callback', @defaultinten);
+% 
+% 
+% intThreshMinh = uicontrol('Parent', mainguih, 'Style', 'Text', 'Units', 'normalized', ...
+%     'Position', [0.70 0.668 0.12 0.04], 'FontSize', 11, 'String', 'Min Intensity');
+% intThreshMin = uicontrol('Parent', mainguih, 'Style', 'Edit', 'FontSize', 11, 'Units', 'normalized', ...
+%     'Position', [0.70 0.64 0.12 0.04]);
+% 
+% intThreshMaxh = uicontrol('Parent', mainguih, 'Style', 'Text', 'Units', 'normalized', ...
+%     'Position', [0.85 0.668 0.12 0.04], 'FontSize', 11, 'String', 'Max Intensity');
+% intThreshMax = uicontrol('Parent', mainguih, 'Style', 'Edit', 'FontSize', 11, 'Units', 'normalized', ...
+%     'Position', [0.85 0.64 0.12 0.04]);
+% 
+% 
+% lifetimethresholdh = uicontrol('Parent', mainguih, 'Style', 'Text',  'Units', 'normalized',...
+%     'Position', [0.70 0.49 0.12 0.04], 'FontSize', 11, 'String', 'Lifetime Min');
+% lftthresholdMINh = uicontrol('Parent', mainguih, 'Style', 'Edit',  'Units', 'normalized',...
+%     'Position', [0.70 0.46 0.12 0.04], 'FontSize', 11);
+% 
+% 
+% lifetimethreshMAXh = uicontrol('Parent', mainguih, 'Style', 'Text',  'Units', 'normalized',...
+%     'Position', [0.85 0.49 0.12 0.04], 'FontSize', 11, 'String', 'Lifetime Max');
+% lftthresholdMAXh = uicontrol('Parent', mainguih, 'Style', 'Edit',  'Units', 'normalized',...
+%     'Position', [0.85 0.46 0.12 0.04], 'FontSize', 11);
+% 
+% 
+% 
+% chithresholdminh = uicontrol('Parent', mainguih, 'Style', 'Text',  'Units', 'normalized',...
+%     'Position', [0.70 0.33 0.12 0.04], 'FontSize', 11, 'String', 'Chi Min');
+% chiminh = uicontrol('Parent', mainguih, 'Style', 'Edit',  'Units', 'normalized', ...
+%     'Position', [0.70 0.30 0.12 0.04], 'FontSize', 11);
+% 
+% 
+% chithresholdmaxh = uicontrol('Parent', mainguih, 'Style', 'Text',  'Units', 'normalized', ...
+%     'Position', [0.85 0.33 0.12 0.04], 'FontSize', 11, 'String', 'Chi Max');
+% chimaxh = uicontrol('Parent', mainguih, 'Style', 'Edit',  'Units', 'normalized', ...
+%     'Position', [0.85 0.30 0.12 0.04], 'FontSize', 11);
+% 
+% 
+% magnifh = uicontrol('Parent', mainguih, 'Style', 'Text',  'Units', 'normalized', ...
+%     'Position', [0.70 0.58 0.12 0.04], 'FontSize', 11, 'String', 'Magnification');
+% magh = uicontrol('Parent', mainguih, 'Style', 'Edit',  'Units', 'normalized', ...
+%     'Position', [0.70 0.555 0.12 0.04], 'FontSize', 11);
+
+
+
+
+
+% hSP = imscrollpanel(mainguih,phCCD);
+% set(hSP,'Units','normalized','Position',[0 .1 1 .9])
+% 
+% hMagBox = immagbox(mainguih,phCCD);
+% pos = get(hMagBox,'Position');
+% set(hMagBox,'Position',[0 0 pos(3) pos(4)])
+% imoverview(phCCD)
+%}
+
+
+
+
+
+
+
+% -----------------------------------------------------------------------------
+%%                     GUI TOOLBOX FUNCTIONS
+% -----------------------------------------------------------------------------
+
 
 function getROI(boxidselecth, eventdata)
 
@@ -275,28 +400,177 @@ function getROI(boxidselecth, eventdata)
     end
     
     
-    % imgC 	image variable name
+    % IMG 	image variable name
     % phCCD imagesc plot handle
     
+    % ---------------------------------------
+    % GET SPINE MORPHOLOGY STATISTICS
+    % ---------------------------------------
     
     ROImask = hROI.createMask(phCCD);
     ROIpos = hROI.getPosition;
     ROIarea = polyarea(ROIpos(:,1),ROIpos(:,2));
 
-    ROI_INTENSITY = imgC .* ROImask;
+    ROI_INTENSITY = IMG .* ROImask;
     
     ROI_INTENSITY_MEAN = mean(ROI_INTENSITY(ROI_INTENSITY > 0));
+                    
+    SPINE.area = ROIarea;
+    SPINE.intensity = ROI_INTENSITY_MEAN;
     
-    
-    flimdata{ROInum} = {ROI_INTENSITY_MEAN, ROIarea};
-                    
-                    
-                    
-    fprintf('\n INTENSITY: % 5.5g \n AREA: % 5.5g \n\n',...
+
+    fprintf('\n TOTAL SPINE INTENSITY: % 5.5g \n TOTAL SPINE AREA: % 5.5g \n\n',...
                 ROI_INTENSITY_MEAN,ROIarea)
-
+        
+    dotsz = 40;
+    cdotsz = 200;
             
+    % ---------------------------------------
+    % GET SPINE-HEAD:NECK MORPHOLOGY STATISTICS
+    % ---------------------------------------
+    % row 1 of dpos is the x,y pos of the line origin
+    % test this using scatter(dpos(1,1),dpos(1,2),'r')
+      
+    % ------  
+    disp('Draw line from dendritic shaft to spine tip (longest extent of spine)')
+    % ------
+    
+	hline = imline(haxCCD);
+	dpos = hline.getPosition(); 
 
+	spineextent = sqrt((dpos(1,1)-dpos(2,1))^2 + (dpos(1,2)-dpos(2,2))^2);
+
+    spineextentcenter = [mean(dpos(:,1)) mean(dpos(:,2))];
+        scatter(spineextentcenter(1),spineextentcenter(2), cdotsz,...
+        'MarkerFaceColor', 'none', 'MarkerEdgeColor', [1 0 0], 'LineWidth', 3)
+
+    
+    [cx,cy,c] = improfile(IMG, dpos(:,1), dpos(:,2), round(spineextent));
+    
+        % sqrt((cx(1)-cx(end))^2 + (cy(1)-cy(end))^2)
+        scatter(cx,cy, dotsz,'MarkerFaceColor', [1 0 0])
+    
+    SPINEHN.spineextent = spineextent;
+    SPINEHN.spineextentintensity = mean(c);
+    SPINEHN.spineextentintensityprofile = c;
+    SPINEHN.spineextentcenter = spineextentcenter;
+    
+    
+    % ------  
+    disp('Draw line across spine-head parallel to dendritic shaft')
+    % ------
+    
+	hline = imline(haxCCD);
+	dpos = hline.getPosition(); 
+
+	spineheadwidth = sqrt((dpos(1,1)-dpos(2,1))^2 + (dpos(1,2)-dpos(2,2))^2);
+
+    spineheadcenter = [mean(dpos(:,1)) mean(dpos(:,2))];
+        scatter(spineheadcenter(1),spineheadcenter(2), cdotsz,...
+        'MarkerFaceColor', 'none', 'MarkerEdgeColor', [1 0 1], 'LineWidth', 3)
+
+    
+    [cx,cy,c] = improfile(IMG, dpos(:,1), dpos(:,2), round(spineheadwidth));
+    
+        % sqrt((cx(1)-cx(end))^2 + (cy(1)-cy(end))^2)
+        scatter(cx,cy, dotsz,'MarkerFaceColor', [1 0 1])
+    
+    SPINEHN.headwidth = spineheadwidth;
+    SPINEHN.headintensity = mean(c);
+    SPINEHN.headintensityprofile = c;
+    SPINEHN.headcenter = spineheadcenter;
+    
+    
+    
+    
+    % ------
+    disp('Draw line along length of spine neck')
+    % ------
+    
+	hline = imline(haxCCD);
+	dpos = hline.getPosition(); 
+
+	spinenecklength = sqrt((dpos(1,1)-dpos(2,1))^2 + (dpos(1,2)-dpos(2,2))^2);
+
+    spineneckcenter = [mean(dpos(:,1)) mean(dpos(:,2))];
+        scatter(spineneckcenter(1),spineneckcenter(2), cdotsz,...
+        'MarkerFaceColor', 'none', 'MarkerEdgeColor', [0 1 0], 'LineWidth', 3)
+
+    
+    [cx,cy,c] = improfile(IMG, dpos(:,1), dpos(:,2), round(spinenecklength));
+    
+        % sqrt((cx(1)-cx(end))^2 + (cy(1)-cy(end))^2)
+        scatter(cx,cy, dotsz,'MarkerFaceColor', [0 1 0])
+    
+    SPINEHN.necklength = spinenecklength;
+    SPINEHN.neckintensity = mean(c);
+    SPINEHN.neckintensityprofile = c;
+    SPINEHN.neckcenter = spineneckcenter;
+    
+    
+    
+    disp(['SPINE HEAD WIDTH:' num2str(SPINEHN.headwidth)])
+    disp(['SPINE NECK LENGTH:' num2str(SPINEHN.necklength)])
+
+    % ---------------------------------------
+    % GET DENDRITE MORPHOLOGY STATISTICS
+    % ---------------------------------------
+
+    disp('Draw line across dendrite region adjacent to spine')
+
+	hline = imline(haxCCD);
+	dpos = hline.getPosition(); 
+      % row 1 of dpos is the x,y pos of the line origin
+      % test this using scatter(dpos(1,1),dpos(1,2),'r')
+    
+	dendritesize = sqrt((dpos(1,1)-dpos(2,1))^2 + (dpos(1,2)-dpos(2,2))^2);
+
+    dendritecenter = [mean(dpos(:,1)) mean(dpos(:,2))];
+        scatter(dendritecenter(1),dendritecenter(2), cdotsz,...
+        'MarkerFaceColor', 'none', 'MarkerEdgeColor', [0 0 1], 'LineWidth', 3)
+
+    
+    [cx,cy,c] = improfile(IMG, dpos(:,1), dpos(:,2), round(dendritesize));
+    
+        % sqrt((cx(1)-cx(end))^2 + (cy(1)-cy(end))^2)
+        scatter(cx,cy, dotsz,'MarkerFaceColor', [0 0 1])
+    
+    DENDRITE.size = dendritesize;
+    DENDRITE.intensity = mean(c);
+    DENDRITE.intensityprofile = c;
+    DENDRITE.center = dendritecenter;
+    
+    disp(['DENDRITE SIZE:' num2str(dendritesize)])
+    
+    
+    
+    plot(haxPRE, c)
+    
+    
+    % ---------------------------------------
+    % SAVE MORPHOLOGY STATISTICS FOR THIS SPINE:DENDRITE PAIR
+    % ---------------------------------------
+    
+    fprintf(['\n TOTAL SPINE INTENSITY: % 5.3f '...
+         '\n TOTAL SPINE AREA:      % 5.1f '...
+         '\n SPINE HEAD WIDTH:      % 5.1f '...
+         '\n SPINE NECK LENGTH:     % 5.1f '...
+         '\n DENDRITE DIAMETER:     % 5.1f '...
+         '\n DENDRITE INTENSITY:    % 5.3f \n\n'],...
+            ROI_INTENSITY_MEAN,ROIarea,...
+            SPINEHN.headwidth,SPINEHN.necklength,...
+            DENDRITE.size, DENDRITE.intensity)
+    
+    flimdata{ROInum} = {ROI_INTENSITY_MEAN, ROIarea, SPINE, SPINEHN, DENDRITE};
+    
+    
+    keyboard
+    
+    
+    % ---------------------------------------
+    % QUESTION DIALOGUE TO KEEP DRAWING OR END
+    % ---------------------------------------
+            
     doagainROI = questdlg('Select next ROI?', 'Select next ROI?', 'Yes', 'No', 'No');
     switch doagainROI
        case 'Yes'
@@ -537,58 +811,87 @@ function loadfile()
 %user for file to load, copies the datastack from the file; sets the image 
 %windows to visible, and plots the images.
 
+    
+    iminfo = imfinfo(imgpath);
+    [im, map] = imread(imgpath);
 
-    imgC = ccdget([datadir datafile]);
+
+    im_size = size(im);
+    im_nmap = numel(map);
+    im_ctype = iminfo.ColorType;
+
+
+    if strcmp(im_ctype, 'truecolor') || numel(im_size) > 2
+
+        IMG = rgb2gray(im);
+        IMG = im2double(IMG);
+
+    elseif strcmp(im_ctype, 'indexed')
+
+        IMG = ind2gray(im,map);
+        IMG = im2double(IMG);
+
+    elseif strcmp(im_ctype, 'grayscale')
+
+        IMG = im2double(im);
+
+    else
+
+        IMG = im;
+
+    end
+    
+    
+    
+    
 
     set(mainguih, 'Visible', 'On');
 
     
-    set(mainguih, 'Colormap', hot);
-    
     axes(haxCCD)
-    colormap(haxCCD,hot)
-    phCCD = imagesc(imgC , 'Parent', haxCCD);
+    colormap(haxCCD,bone); % parula
+    phCCD = imagesc(IMG , 'Parent', haxCCD);
               pause(1)
               
-              
-              
-    ccmap = hot;
-    cmmap = [0 0 0; ccmap(end-40:end,:)];    
+    ccmap = bone;
+    cmmap = [zeros(10,3); ccmap(end-40:end,:)];
+    colormap(haxCCD,cmmap)
     mainguih.Colormap = cmmap;
+    
+    
     
     pause(.2)
     imXlim = haxCCD.XLim;
     imYlim = haxCCD.YLim;
 
     
-    xdim = size(imgC,2); 
-    ydim = size(imgC,1);
+    xdim = size(IMG,2); 
+    ydim = size(IMG,1);
 
-
+    
+    
     %----------------------------------------------------
     %           SET USER-EDITABLE GUI VALUES
     %----------------------------------------------------
-    set(intThreshMin, 'String', num2str(intenseThreshMIN));
-    set(intThreshMax, 'String', num2str(intenseThreshMAX));
-
-    set(intThreshMin, 'String', num2str(intenseThreshMIN));
-    set(intThreshMax, 'String', num2str(intenseThreshMAX));
-
-    set(lftthresholdMINh, 'String', num2str(lifeThreshMIN));
-    set(lftthresholdMAXh, 'String', num2str(lifeThreshMAX));
-
-    set(chiminh, 'String', num2str(chiThreshMIN));
-    set(chimaxh, 'String', num2str(chiThreshMAX));
-
-    set(magh, 'String', num2str(magnification));
+%     set(intThreshMin, 'String', num2str(intenseThreshMIN));
+%     set(intThreshMax, 'String', num2str(intenseThreshMAX));
+% 
+%     set(intThreshMin, 'String', num2str(intenseThreshMIN));
+%     set(intThreshMax, 'String', num2str(intenseThreshMAX));
+% 
+%     set(lftthresholdMINh, 'String', num2str(lifeThreshMIN));
+%     set(lftthresholdMAXh, 'String', num2str(lifeThreshMAX));
+% 
+%     set(chiminh, 'String', num2str(chiThreshMIN));
+%     set(chimaxh, 'String', num2str(chiThreshMAX));
+% 
+%     set(magh, 'String', num2str(magnification));
 
     set(mainguih, 'Name', datafile);
     set(boxidh, 'String', int2str(1));
     set(haxCCD, 'XLim', [1 xdim]);
     set(haxCCD, 'YLim', [1 ydim]);
     %----------------------------------------------------
-    
-    
     
     
     
@@ -627,9 +930,9 @@ function prepForSave(savefileh, eventData)
         sROIpos = sROI(nn).Vertices;
         sROIarea = polyarea(sROIpos(:,1),sROIpos(:,2));
         sROImask = poly2mask(sROIpos(:,1),sROIpos(:,2), ...
-                             size(imgC,1), size(imgC,2));
+                             size(IMG,1), size(IMG,2));
 
-        ROI_INTENSITY = imgC .* sROImask;
+        ROI_INTENSITY = IMG .* sROImask;
     
         ROI_INTENSITY_MEAN = mean(ROI_INTENSITY(ROI_INTENSITY > 0));
 
@@ -689,6 +992,37 @@ function saveFile(savefileh, eventData)
 
 end
 
+
+%----------------------------------------------------
+%        IMAGE SIDER CALLBACK
+%----------------------------------------------------
+function cmapslider(hObject, eventdata)
+
+    % Hints: hObject.Value returns position of slider
+    %        hObject.Min and hObject.Max determine range of slider
+    % sunel = get(handles.sunelslider,'value'); % Get current light elev.
+    % sunaz = get(hObject,'value');   % Varies from -180 -> 0 deg
+
+    
+    
+    
+    slideVal = ceil(cmapsliderH.Value);
+
+              
+    % cmap = colormap(haxCCD);
+
+    ccmap = bone; % parula
+    
+    % cmmap = [zeros(slideVal,3); ccmap(end-40:end,:)];
+    cmmap = [zeros(slideVal,3); ccmap(slideVal:end,:)];
+    
+    
+    colormap(haxCCD,cmmap)
+
+    
+    pause(.05)
+
+end
 
 
 

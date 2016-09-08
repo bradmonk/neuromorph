@@ -1,4 +1,4 @@
-function varargout = neuromorph(varargin)
+function varargout = neuromorph2(varargin)
 %% neuromorph.m - NEURON MORPHOLOGY TOOLBOX
 %{
 % 
