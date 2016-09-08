@@ -8,10 +8,6 @@
 *.txt
 
 # Explicitly ignore some folders
-testdata
-testdata/*
-gcdata
-gcdata/*
+neuromorphdata
+neuromorphdata/*
 archive
-gcdat
-gcdat/*
