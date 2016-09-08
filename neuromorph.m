@@ -564,9 +564,6 @@ function getROI(boxidselecth, eventdata)
     flimdata{ROInum} = {ROI_INTENSITY_MEAN, ROIarea, SPINE, SPINEHN, DENDRITE};
     
     
-    keyboard
-    
-    
     % ---------------------------------------
     % QUESTION DIALOGUE TO KEEP DRAWING OR END
     % ---------------------------------------
