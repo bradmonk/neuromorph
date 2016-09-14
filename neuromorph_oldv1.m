@@ -1,4 +1,4 @@
-function varargout = neuromorph2(varargin)
+function varargout = neuromorph_oldv1(varargin)
 %% neuromorph.m - NEURON MORPHOLOGY TOOLBOX
 %{
 % 
@@ -85,7 +85,7 @@ datadate = '';
 
 
 datadir = '/Users/bradleymonk/Documents/MATLAB/myToolbox/LAB/neuromorph/neuromorphdata/organotypic/DIV15';
-% datafile = 'Intensity Image of slice1-a-n1.bmp';
+datafile = 'Intensity Image of slice1-a-n1.bmp';
 datadate = '20160902';
 
 global imgpath
@@ -112,9 +112,8 @@ imgpath = [datadir '/' datafile];
 
 %% ESTABLISH GLOBALS AND SET STARTING VALUES
 
-global IMG DENDRITE SPINE SPINEHN ROISAVES
+global IMG DENDRITE SPINE SPINEHN
 IMG = [];
-ROISAVES = [];
 
 global haxPRE memos memoboxH
 
@@ -321,7 +320,7 @@ memoboxH = uicontrol('Parent',memopanelH,'Style','listbox','Units','normalized',
 
 
 
-%%
+
 %----------------------------------------------------
 %     IMPORT IMAGE & LOAD DEFAULT TOOLBOX PARAMETERS
 %----------------------------------------------------
@@ -490,14 +489,6 @@ function getROI(boxidselecth, eventdata)
 %         hROI = imfreehand(haxCCD);
 %     end
 
-
-    dotsz = 30;
-    cdotsz = 150;
-    
-    
-
-    
-
     
     % ---------------------------------------
     % GET SPINE TOTAL AREA MORPHOLOGY STATISTICS
@@ -528,13 +519,9 @@ function getROI(boxidselecth, eventdata)
 
     fprintf('\n TOTAL SPINE INTENSITY: % 5.5g \n TOTAL SPINE AREA: % 5.5g \n\n',...
                 ROI_INTENSITY_MEAN,ROIarea)
-%
 
-
-ROISAVES(ROInum).SpineROI = hROI;
-ROISAVES(ROInum).SpineMask = ROImask;
-ROISAVES(ROInum).SpinePos = ROIpos;
-
+    dotsz = 30;
+    cdotsz = 150;
 
     % ---------------------------------------
     % GET SPINE-HEAD:NECK MORPHOLOGY STATISTICS
@@ -570,19 +557,6 @@ ROISAVES(ROInum).SpinePos = ROIpos;
     SPINEHN.spineextentintensityprofile = c;
     SPINEHN.spineextentcenter = spineextentcenter;
     
-    ROISAVES(ROInum).SpineExtentLine = hline;
-    ROISAVES(ROInum).SpineExtentPos = dpos;
-    ROISAVES(ROInum).SpineExtentCenter = spineextentcenter;
-    ROISAVES(ROInum).SpineExtentX = cx;
-    ROISAVES(ROInum).SpineExtentY = cy;
-
-    
-    % ------ Plot F Profile ----
-    plot(haxPRE, c)
-    axes(haxCCD)
-    % --------------------------
-    
-    
     
     % ------  
     disp('Draw line across spine-head parallel to dendritic shaft')
@@ -612,16 +586,7 @@ ROISAVES(ROInum).SpinePos = ROIpos;
     SPINEHN.headintensityprofile = c;
     SPINEHN.headcenter = spineheadcenter;
     
-    ROISAVES(ROInum).SpineHeadLine = hline;
-    ROISAVES(ROInum).SpineHeadPos = dpos;
-    ROISAVES(ROInum).SpineHeadCenter = spineheadcenter;
-    ROISAVES(ROInum).SpineHeadX = cx;
-    ROISAVES(ROInum).SpineHeadY = cy;
     
-    % ------ Plot F Profile ----
-    plot(haxPRE, c)
-    axes(haxCCD)
-    % --------------------------
     
     
     % ------
@@ -652,16 +617,7 @@ ROISAVES(ROInum).SpinePos = ROIpos;
     SPINEHN.neckintensityprofile = c;
     SPINEHN.neckcenter = spineneckcenter;
     
-    ROISAVES(ROInum).SpineNeckLine = hline;
-    ROISAVES(ROInum).SpineNeckPos = dpos;
-    ROISAVES(ROInum).SpineNeckCenter = spineneckcenter;
-    ROISAVES(ROInum).SpineNeckX = cx;
-    ROISAVES(ROInum).SpineNeckY = cy;
     
-    % ------ Plot F Profile ----
-    plot(haxPRE, c)
-    axes(haxCCD)
-    % --------------------------
     
     disp(['SPINE HEAD WIDTH:' num2str(SPINEHN.headwidth)])
     disp(['SPINE NECK LENGTH:' num2str(SPINEHN.necklength)])
@@ -699,18 +655,10 @@ ROISAVES(ROInum).SpinePos = ROIpos;
     DENDRITE.intensityprofile = c;
     DENDRITE.center = dendritecenter;
     
-    ROISAVES(ROInum).DendriteLine = hline;
-    ROISAVES(ROInum).DendritePos = dpos;
-    ROISAVES(ROInum).DendriteCenter = dendritecenter;
-    ROISAVES(ROInum).DendriteX = cx;
-    ROISAVES(ROInum).DendriteY = cy;
-    
     disp(['DENDRITE SIZE:' num2str(dendritesize)])
     
-    % ------ Plot F Profile ----
-    plot(haxPRE, c)
-    axes(haxCCD)
-    % --------------------------
+    
+    
     
     
     
@@ -740,20 +688,15 @@ ROISAVES(ROInum).SpinePos = ROIpos;
     DENDRITE.nearestspine = nearestspine;
     DENDRITE.nearestspineint = mean(c);
     DENDRITE.nearestspineprofile = c;
-    DENDRITE.nearestspinecenter = nearestspinecenter;
+    DENDRITE.nearestspinecenter = nearestspinecenter;        
     
     
-    ROISAVES(ROInum).SpineNearLine = hline;
-    ROISAVES(ROInum).SpineNearPos = dpos;
-    ROISAVES(ROInum).SpineNearCenter = nearestspinecenter;
-    ROISAVES(ROInum).SpineNearX = cx;
-    ROISAVES(ROInum).SpineNearY = cy;
-     
+    % ---------------------------------------
+    % PLOT LINE PROFILE INTENSITY DATA
+    % ---------------------------------------    
     
-    % ------ Plot F Profile ----
     plot(haxPRE, c)
-    axes(haxCCD)
-    % --------------------------
+    
 
     
     spf1 = sprintf(['\n TOTAL SPINE INTENSITY: % 5.3f '...
@@ -790,7 +733,7 @@ ROISAVES(ROInum).SpinePos = ROIpos;
     
 
     
-    flimdata{ROInum} = {SPINE, SPINEHN, DENDRITE};
+    flimdata{ROInum} = {ROI_INTENSITY_MEAN, ROIarea, SPINE, SPINEHN, DENDRITE};
     
     
     % ---------------------------------------
@@ -809,6 +752,109 @@ ROISAVES(ROInum).SpinePos = ROIpos;
 
     set(gcf,'Pointer','arrow')
 
+end
+
+
+
+function lifetimeviewer(lifetimeviewerh, eventData)
+
+    set(mainguih, 'Visible', 'Off');
+    set(initmenuh, 'Visible', 'Off');
+
+    lftthresholdMIN = str2double(get(lftthresholdMINh, 'String'));
+    lftthresholdMAX = str2double(get(lftthresholdMAXh, 'String'));
+    
+    intenthresholdMIN = str2double(get(intThreshMin, 'String'));
+    intenthresholdMAX = str2double(get(intThreshMax, 'String'));
+    
+    intPminmax = prctile(intensity(:),[intenthresholdMIN intenthresholdMAX]);
+    
+    chimin = str2double(get(chiminh, 'String'));
+    chimax = str2double(get(chimaxh, 'String'));
+
+
+    ChiG = (chi >= chimin & chi <= chimax);
+    IntG = (intensity >= intPminmax(1) & intensity <= intPminmax(2));
+    LifG = (lifetime >= lftthresholdMIN & lifetime <= lftthresholdMAX);
+    AllG = (ChiG .* IntG .* LifG) > 0;
+
+        
+    % close all
+    fh3=figure('Units','normalized','OuterPosition',[.05 .27 .9 .7],'Color','w');
+    ah1 = axes('Position',[.05 .55 .2 .4],'Color','none','XTick',[],'YTick',[]);
+    ah2 = axes('Position',[.30 .55 .2 .4],'Color','none','XTick',[],'YTick',[]);
+    ah3 = axes('Position',[.05 .05 .2 .4],'Color','none','XTick',[],'YTick',[]);
+    ah4 = axes('Position',[.30 .05 .2 .4],'Color','none','XTick',[],'YTick',[]);
+    ah5 = axes('Position',[.55 .15 .40 .7],'Color','none','XTick',[],'YTick',[]);
+    
+        axes(ah1)
+    imagesc(ChiG); title('Pixels within CHI thresholds')
+        axes(ah2)
+    imagesc(IntG); title('Pixels within INTENSITY thresholds')
+        axes(ah3)
+    imagesc(LifG); title('Pixels within LIFETIME thresholds')
+        axes(ah4)
+    imagesc(AllG); title('Pixels within ALL thresholds')
+        axes(ah5)
+    imagesc(lifetime .* AllG); title('Fluorescent Lifetime of pixels above ALL thresholds')
+        colormap(ah5,[0 0 0; flipud(jet(23))])
+        caxis([lftthresholdMIN lftthresholdMAX])
+        colorbar
+        set(ah1,'YDir','normal')
+        set(ah2,'YDir','normal')
+        set(ah3,'YDir','normal')
+        set(ah4,'YDir','normal')
+        set(ah5,'YDir','normal')
+        
+    disp('Close figure to continue')
+    uiwait(fh3)
+    
+    
+    set(mainguih, 'Visible', 'On');
+
+end
+
+
+
+function setinten(hObject, eventdata)
+    
+       lowerinten = str2num(intThreshMin.String);
+       upperinten = str2num(intThreshMax.String);
+       
+       lowerintenPCT = prctile(intensity(:),lowerinten);
+       upperintenPCT = prctile(intensity(:),upperinten);
+              
+       set(haxCCD,'CLim',[lowerintenPCT upperintenPCT])
+
+end
+
+
+
+function defaultinten(hObject, eventdata)
+        
+       set(intThreshMin, 'String', num2str(intenseThreshMIN));
+       set(intThreshMax, 'String', num2str(intenseThreshMAX));
+
+end
+
+
+
+function closelftintenw(hObject, eventdata)
+%Closelftintenw sets both lifetime image and intensity image windows to
+%invisible. The initial menu becomes visible again for further selection. 
+    
+       set(mainguih, 'Visible', 'Off');
+       set(initmenuh, 'Visible', 'On');
+       saveROI = zeros(200, 17);
+       saveData = zeros(200, 9);
+       datastack = zeros(1,1,3,'double');
+       lifetime = zeros(1, 1);
+       intensity = zeros(1, 1);
+       chi = zeros(1, 1);
+       lifetimeimage = zeros(1, 1);
+       intensityimage = zeros(1, 1);
+       xdim = 0;
+       ydim = 0;
 end
 
 
@@ -885,12 +931,53 @@ end
 
 
 
+function resetROIS(deleteROIh, eventData)
+    
+    ROInum = str2double(get(ROIIDh, 'String'));
+        
+    % spf1 = sprintf('Delete ROI #%1.2g ?.',ROInum);
+    yesno = questdlg('Reset all ROIs and start over?','Warning','Yes','No','Yes');
+    
+    
+    if strcmp(yesno,'Yes')
+    
+        flimdata(:) = [];
+        
+        delete(haxCCD.Children(1:end-2))
+        
+        set(ROIIDh, 'String','1')
+        
+        msgbox('ROI data-container and image has been reset');
+        
+    else
+        msgbox('Phew, nothing was deleted!');
+    end
+    
+end
+
+
+
 function boxselection(source,callbackdata)
     
     % callbackdata.OldValue.String
     boxtype = callbackdata.NewValue.String;
 
 end
+
+
+
+function getdendsize(boxidselecth, eventdata)
+
+
+   hline = imline;
+   dpos = hline.getPosition();
+    
+   dendritesize = sqrt((dpos(1,1)-dpos(2,1))^2 + (dpos(1,2)-dpos(2,2))^2);
+
+   disp(['dendrite size:' num2str(dendritesize)])
+
+end
+
 
 
 
@@ -973,6 +1060,56 @@ end
 
 
 
+
+function prepForSave(savefileh, eventData)
+    
+    % ------
+    
+    lftthresholdMIN = str2double(lftthresholdMINh.String);
+    lftthresholdMAX = str2double(lftthresholdMAXh.String);
+        
+    intPminmax = prctile(intensity(:),...
+        [str2double(intThreshMin.String) str2double(intThreshMax.String)]);
+    
+    chimin = str2double(chiminh.String);
+    chimax = str2double(chimaxh.String);
+    
+    ChiGood       = (chi >= chimin & chi <= chimax);
+    IntensityGood = (intensity >= intPminmax(1) & intensity <= intPminmax(2));
+    LifeGood      = (lifetime >= lftthresholdMIN & lifetime <= lftthresholdMAX);
+    AllGood       = (ChiGood .* IntensityGood .* LifeGood) > 0;
+
+    
+    
+    
+    
+    % ------
+    sROI = findobj(haxCCD,'Type','patch');
+    
+    for nn = 1:length(sROI)
+        
+        sROIpos = sROI(nn).Vertices;
+        sROIarea = polyarea(sROIpos(:,1),sROIpos(:,2));
+        sROImask = poly2mask(sROIpos(:,1),sROIpos(:,2), ...
+                             size(IMG,1), size(IMG,2));
+
+        ROI_INTENSITY = IMG .* sROImask;
+    
+        ROI_INTENSITY_MEAN = mean(ROI_INTENSITY(ROI_INTENSITY > 0));
+
+        flimdats{nn} = {sROIarea,ROI_INTENSITY_MEAN};
+    
+    end
+    % ------
+        
+end
+
+
+
+
+
+
+
 function saveFile(savefileh, eventData)
     
     
@@ -985,70 +1122,22 @@ function saveFile(savefileh, eventData)
                                 {datafile(1:end-4)});
 
     Datafilename = char(strcat(saveDatafilename));
+
+    maglevel = str2double(magh.String);
     
-%{    
-% SPINE    % flimdata{1,1}
-% area: 349.0402
-% intensity: 0.5744                     
-
-
-% SPINEHN  % flimdata{1,2}
-% spineextent: 26.4981
-% spineextentintensity: 0.6986
-% spineextentintensityprofile: [26x1 double]
-% spineextentcenter: [108.4859 119.9637]
-% headwidth: 17.7264
-% headintensity: 0.5338
-% headintensityprofile: [18x1 double]
-% headcenter: [108.0432 123.1734]
-% necklength: 6.0418
-% neckintensity: 0.7196
-% neckintensityprofile: [6x1 double]
-% neckcenter: [109.9247 109.5600]
-
-
-% DENDRITE  % flimdata{1,3}
-% size: 21.7887
-% intensity: 0.8098
-% intensityprofile: [22x1 double]
-% center: [112.9130 97.0534]
-% nearestspine: 36.8842
-% nearestspineint: 0.9783
-% nearestspineprofile: [37x1 double]
-% nearestspinecenter: [129.0720 105.9076]    
-%}
-    
-    
-flimdata = flimdata(~cellfun(@isempty, flimdata));
+    if numel(dpos) < 1; % If dendrite size was manually selected, numel(dpos) > 1
+        dendritesize = maglevel*5;
+    end
 
     %for nn = 1:size(flimdats,2)
     for nn = 1:size(flimdata,2)
-        flimdat(nn,:) = [flimdata{1,nn}{1}.area ...
-                         flimdata{1,nn}{1}.intensity ...
-                         flimdata{1,nn}{2}.spineextent ...
-                         flimdata{1,nn}{2}.spineextentintensity ...
-                         flimdata{1,nn}{2}.headwidth ...
-                         flimdata{1,nn}{2}.headintensity ...
-                         flimdata{1,nn}{2}.necklength ...
-                         flimdata{1,nn}{2}.neckintensity ...
-                         flimdata{1,nn}{3}.size ...
-                         flimdata{1,nn}{3}.intensity ...
-                         flimdata{1,nn}{3}.nearestspine ...
-                         flimdata{1,nn}{3}.nearestspineint ...
-                         ];        
-
+        flimdat(nn,:) = [flimdata{1,nn}{1:2} maglevel dendritesize];        
         ROInames{nn} = num2str(nn);        
     end
     
     
     flimtab = array2table(flimdat);
-    flimtab.Properties.VariableNames = {...
-        'SPINE_AREA' 'SPINE_F' 'SPINE_LEN' 'SPINE_LEN_F' ...
-        'HEAD_WIDTH' 'HEAD_F' 'NECK_LENGTH' 'NECK_F'...
-        'DEND_DIAMETER' 'DEND_F' 'NEARBY_SPINE_DIST' 'NEARBY_SPINE_FPROF'...
-        };
-    
-    
+    flimtab.Properties.VariableNames = {'INTENSITY' 'AREA' 'MAG' 'DSIZE'};
     flimtab.Properties.RowNames = ROInames;
     
     flimtab.FILE = repmat(datafile,size(flimdata,2),1);
@@ -1056,8 +1145,6 @@ flimdata = flimdata(~cellfun(@isempty, flimdata));
     
     
     writetable(flimtab,[Datafilename '.csv'],'WriteRowNames',true)
-    save([Datafilename '.mat'],'flimdata','ROISAVES')
-    
     disp('Data saved successfully!')
     % msgbox('Data saved successfully');
 
