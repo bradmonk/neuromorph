@@ -84,8 +84,8 @@ datafile = '';
 datadate = '';
 
 
-datadir = '/Users/bradleymonk/Documents/MATLAB/myToolbox/LAB/neuromorph/neuromorphdata/organotypic/DIV15';
-% datafile = 'Intensity Image of slice1-a-n1.bmp';
+datadir = '/Users/bradleymonk/Documents/MATLAB/myToolbox/LAB/neuromorph/neuromorphdata/organotypic/GoodPix';
+datafile = 'dendrite2.tif';
 datadate = '20160902';
 
 global imgpath
@@ -104,7 +104,7 @@ home = cd;
 disp(['HOME PATH: ' datadir])
 
 if numel(datafile) < 1
-    datafile = uigetfile('*.bmp');
+    datafile = uigetfile('*.tif*; *.bmp');
 end
 
 imgpath = [datadir '/' datafile];
@@ -112,38 +112,91 @@ imgpath = [datadir '/' datafile];
 
 %% ESTABLISH GLOBALS AND SET STARTING VALUES
 
-global IMG DENDRITE SPINE SPINEHN ROISAVES
+global IMG DENDRITE SPINE SPINEHN ROISAVES ROInum
 IMG = [];
 ROISAVES = [];
 
+ROISAVES.SpineMask = [];
+ROISAVES.SpinePos = [];
+
+ROISAVES.SpineExtentPos = [0 0];
+ROISAVES.SpineExtentCenter = [];
+ROISAVES.SpineExtentX = [];
+ROISAVES.SpineExtentY = [];
+    
+ROISAVES.SpineHeadPos = [0 0];
+ROISAVES.SpineHeadCenter = [];
+ROISAVES.SpineHeadX = [];
+ROISAVES.SpineHeadY = [];    
+
+ROISAVES.SpineNeckPos = [0 0];
+ROISAVES.SpineNeckCenter = [];
+ROISAVES.SpineNeckX = [];
+ROISAVES.SpineNeckY = [];
+
+ROISAVES.DendritePos = [0 0];
+ROISAVES.DendriteCenter = [];
+ROISAVES.DendriteX = [];
+ROISAVES.DendriteY = [];
+
+ROISAVES.SpineNearPos = [0 0];
+ROISAVES.SpineNearCenter = [];
+ROISAVES.SpineNearX = [];
+ROISAVES.SpineNearY = [];
+
+
+
+SPINE.intensity = [];
+SPINE.area = [];
+SPINEHN.spineextent = [];
+SPINEHN.spineextentintensity = [];
+SPINEHN.spineextentintensityprofile = [];
+SPINEHN.spineextentcenter = [];
+SPINEHN.headwidth = [];
+SPINEHN.headintensity = [];
+SPINEHN.headintensityprofile = [];
+SPINEHN.headcenter = [];
+SPINEHN.necklength = [];
+SPINEHN.neckintensity = [];
+SPINEHN.neckintensityprofile = [];
+SPINEHN.neckcenter = [];
+DENDRITE.size = [];
+DENDRITE.intensity = [];
+DENDRITE.intensityprofile = [];
+DENDRITE.center = [];
+DENDRITE.nearestspine = [];
+DENDRITE.nearestspineint = [];
+DENDRITE.nearestspineprofile = [];
+DENDRITE.nearestspinecenter = [];
+
+
+SPINE.area = 0;
+SPINE.intensity = 0;
+SPINEHN.spineextent = 0;
+SPINEHN.spineextentintensity = 0;
+SPINEHN.headwidth = 0;
+SPINEHN.headintensity = 0;
+SPINEHN.necklength = 0;
+SPINEHN.neckintensity = 0;
+DENDRITE.size = 0;
+DENDRITE.intensity = 0;
+DENDRITE.nearestspine = 0;
+DENDRITE.nearestspineint = 0;
+
+
+
+
 global haxPRE memos memoboxH
+global dotsz cdotsz
+dotsz = 30;
+cdotsz = 150;
 
 
-
-
-
-
-% global LifeImageFile MORPHcmap
-% global intenseThreshMIN intenseThreshMAX intenseThreshPMIN intenseThreshPMAX
-% global lifeThreshMIN lifeThreshMAX chiThreshMIN chiThreshMAX 
 global magnification maglevel
 global MORPHdata MORPHdat MORPHtab MORPHd ROInames Datafilename 
-global hROI ROImask ROIpos ROIarea dendritesize dpos
-global ChiGood IntensityGood LifeGood AllGood
-global ROI_LIFETIME ROI_INTENSITY ROI_CHI
-global ROI_LIFETIME_MEAN ROI_INTENSITY_MEAN ROI_CHI_MEAN sROIarea
+global hROI ROImask ROIpos dendritesize dpos
 global imXlim imYlim VxD dVOL
 
-% LifeImageFile = 0;
-% MORPHcmap = MORPHcolormap;
-% intenseThreshMIN = 85.000;
-% intenseThreshMAX = 99.999;
-% intenseThreshPMIN = 2;
-% intenseThreshPMAX = 10;
-% lifeThreshMIN = 1000;
-% lifeThreshMAX = 2900;
-% chiThreshMIN = 0.7;
-% chiThreshMAX = 2.0;
 magnification = 6;
 maglevel = 6;
 dendritesize = maglevel*5;
@@ -158,21 +211,10 @@ hROI = [];
 ROImask = [];
 ROIpos = [];
 ROIarea = [];
-ChiGood = [];
-IntensityGood = [];
-LifeGood = [];
-AllGood = [];
-ROI_LIFETIME = [];
 ROI_INTENSITY = [];
-ROI_CHI = [];
-ROI_LIFETIME_MEAN = [];
 ROI_INTENSITY_MEAN = [];
-ROI_CHI_MEAN = [];
-sROIarea = [];
 VxD = 1;
 dVOL = 1;
-% imXlim  = [];
-% imYlim = [];
 
 
 global MORPHdats ccmap cmmap phCCD
@@ -180,11 +222,7 @@ MORPHdats = {};
 ccmap = [];
 cmmap = [];
 
-
-
-global boxtype
-boxtype = 'freehand'; % freehand:1  rectangle:2  elipse:3
-
+% global ROI_INTENSITY ROI_INTENSITY_MEAN ROIarea
 
 
 %########################################################################
@@ -235,14 +273,10 @@ ROIIDh = uicontrol('Parent', IPpanelH, 'Style', 'Edit', 'Units', 'normalized', .
     'Position', [0.68 0.81 0.25 0.10], 'FontSize', 11); 
 
 
-
-
-
-% Create three radio buttons in the button group.
-measureButtonsH = uibuttongroup('Parent', IPpanelH, 'Visible','off',...
-                  'Units', 'normalized',...
-                  'Position',[0.05 0.15 0.90 0.60],...
-                  'SelectionChangedFcn',@boxselection);
+              
+measureButtonsH = uipanel('Parent', IPpanelH,'Title','Analyses','FontSize',10,...
+    'BackgroundColor',[.95 .95 .95],...
+    'Position', [0.05 0.15 0.90 0.60]); % 'Visible', 'Off',              
 
 yp = 1 - ((1/6.2) .* (1:6));              
 bpos1 = [0.05 yp(1) 0.95 0.14];
@@ -252,43 +286,20 @@ bpos4 = [0.05 yp(4) 0.95 0.14];
 bpos5 = [0.05 yp(5) 0.95 0.14];
 bpos6 = [0.05 yp(6) 0.95 0.14];
 
-button_SpineArea = uicontrol(measureButtonsH,'Style','radiobutton',...
-                  'String','Spine Area',...
-                  'Units', 'normalized',...
-                  'Position',bpos1,...
-                  'HandleVisibility','off');
-              
-button_SpineLen = uicontrol(measureButtonsH,'Style','radiobutton',...
-                  'String','Spine Total Length',...
-                  'Units', 'normalized',...
-                  'Position',bpos2,...
-                  'HandleVisibility','off');
+checkbox1H = uicontrol('Parent', measureButtonsH,'Style','checkbox','Units','normalized',...
+    'Position', bpos1 ,'String','Spine Area', 'Value',1);
+checkbox2H = uicontrol('Parent', measureButtonsH,'Style','checkbox','Units','normalized',...
+    'Position', bpos2 ,'String','Spine Total Length', 'Value',1);
+checkbox3H = uicontrol('Parent', measureButtonsH,'Style','checkbox','Units','normalized',...
+    'Position', bpos3 ,'String','Spine Head Diameter', 'Value',1);
+checkbox4H = uicontrol('Parent', measureButtonsH,'Style','checkbox','Units','normalized',...
+    'Position', bpos4 ,'String','Spine Neck Length', 'Value',1);
+checkbox5H = uicontrol('Parent', measureButtonsH,'Style','checkbox','Units','normalized',...
+    'Position', bpos5 ,'String','Dendritic Shaft Diameter', 'Value',1);
+checkbox6H = uicontrol('Parent', measureButtonsH,'Style','checkbox','Units','normalized',...
+    'Position', bpos6 ,'String','Nearest Neighbor Spine', 'Value',1);
 
-button_HeadLen = uicontrol(measureButtonsH,'Style','radiobutton',...
-                  'String','Spine Head Diameter',...
-                  'Units', 'normalized',...
-                  'Position',bpos3,...
-                  'HandleVisibility','off');
-              
-button_NeckLen = uicontrol(measureButtonsH,'Style','radiobutton',...
-                  'String','Spine Neck Length',...
-                  'Units', 'normalized',...
-                  'Position',bpos4,...
-                  'HandleVisibility','off');              
 
-button_ShaftLen = uicontrol(measureButtonsH,'Style','radiobutton',...
-                  'String','Dendritic Shaft Diameter',...
-                  'Units', 'normalized',...
-                  'Position',bpos5,...
-                  'HandleVisibility','off');              
-
-button_NearestSpine = uicontrol(measureButtonsH,'Style','radiobutton',...
-                  'String','Nearest Spine',...
-                  'Units', 'normalized',...
-                  'Position',bpos6,...
-                  'HandleVisibility','off');              
-              
-measureButtonsH.Visible = 'on';
 
 
 savefileh = uicontrol('Parent', IPpanelH, 'Units', 'normalized', ...
@@ -305,7 +316,7 @@ loadROIh = uicontrol('Parent', IPpanelH, 'Units', 'normalized', ...
 %           MEMO CONSOLE GUI WINDOW
 %----------------------------------------------------
 
-memopanelH = uipanel('Title','Memo Log ','FontSize',10,...
+memopanelH = uipanel('Parent', mainguih,'Title','Memo Log ','FontSize',10,...
     'BackgroundColor',[.95 .95 .95],...
     'Position', [0.62 0.30 0.30 0.29]); % 'Visible', 'Off',
 
@@ -483,6 +494,12 @@ axes(haxCCD)
 % -----------------------------------------------------------------------------
 
 
+
+
+%----------------------------------------------------
+%        QUANTIFY SPINE ROI
+%----------------------------------------------------
+%{
 function getROI(boxidselecth, eventdata)
 
     ROInum = str2num(ROIIDh.String);
@@ -493,6 +510,36 @@ function getROI(boxidselecth, eventdata)
 %         hROI = imellipse(haxCCD);
 %     else % strcmp(boxtype,'freehand')
 %         hROI = imfreehand(haxCCD);
+%     end
+
+
+
+%     if checkbox1H.Value
+%         smoothimg
+%     end
+%     
+%     if checkbox2H.Value
+%         cropimg
+%     end
+%     
+%     if checkbox3H.Value
+%         imgblocks
+%     end
+% 
+%     if checkbox4H.Value
+%         reshapeData
+%     end
+% 
+%     if checkbox5H.Value
+%         alignCSframes
+%     end
+% 
+%     if checkbox6H.Value
+%         dFoverF
+%     end
+% 
+%     if checkbox7H.Value
+%         timepointMeans
 %     end
 
 
@@ -570,7 +617,7 @@ ROISAVES(ROInum).SpinePos = ROIpos;
     SPINEHN.spineextentintensityprofile = c;
     SPINEHN.spineextentcenter = spineextentcenter;
     
-    ROISAVES(ROInum).SpineExtentLine = hline;
+    % ROISAVES(ROInum).SpineExtentLine = hline;
     ROISAVES(ROInum).SpineExtentPos = dpos;
     ROISAVES(ROInum).SpineExtentCenter = spineextentcenter;
     ROISAVES(ROInum).SpineExtentX = cx;
@@ -810,9 +857,411 @@ ROISAVES(ROInum).SpinePos = ROIpos;
     set(gcf,'Pointer','arrow')
 
 end
+%}
+function getROI(boxidselecth, eventdata)
+
+    ROInum = str2num(ROIIDh.String);
+
+
+    if checkbox1H.Value
+        MORPHOa(ROInum)
+    end
+    
+    if checkbox2H.Value
+        MORPHOb(ROInum)
+    end
+    
+    if checkbox3H.Value
+        MORPHOc(ROInum)
+    end
+
+    if checkbox4H.Value
+        MORPHOd(ROInum)
+    end
+
+    if checkbox5H.Value
+        MORPHOe(ROInum)
+    end
+
+    if checkbox6H.Value
+        MORPHOf(ROInum)
+    end
+
+    
+    spf1 = sprintf(['\n TOTAL SPINE INTENSITY: % 5.3f '...
+     '\n TOTAL SPINE AREA:      % 5.1f '...
+     '\n SPINE HEAD WIDTH:      % 5.1f '...
+     '\n SPINE NECK LENGTH:     % 5.1f '...
+     '\n NEAREST SPINE DIST:    % 5.1f '...
+     '\n DENDRITE DIAMETER:     % 5.1f '...
+     '\n DENDRITE INTENSITY:    % 5.3f \n\n'],...
+     SPINE.intensity,SPINE.area,...
+     SPINEHN.headwidth,SPINEHN.necklength,...
+     DENDRITE.nearestspine,...
+     DENDRITE.size, DENDRITE.intensity);
+    disp(spf1)
+    
+    % ------
+    memos(1:end-1) = memos(2:end);     
+    memos{3} = ['TOTAL SPINE INTENSITY: ' num2str(SPINE.intensity)];
+    memos{4} = ['TOTAL SPINE AREA: '      num2str(SPINE.area)];
+    memos{5} = ['SPINE HEAD WIDTH: '      num2str(SPINEHN.headwidth)];
+    memos{6} = ['SPINE NECK LENGTH: '     num2str(SPINEHN.necklength)];
+    memos{7} = ['DENDRITE DIAMETER: '     num2str(DENDRITE.size)];
+    memos{8} = ['DENDRITE INTENSITY: '    num2str(DENDRITE.intensity)];
+    memos{9} = ['NEAREST SPINE DIST: '    num2str(DENDRITE.nearestspine)];
+    memos{end} = ' ';
+    memoboxH.String = memos;
+    pause(.02)
+    % ------
+    
+    
+    % ---------------------------------------
+    % SAVE MORPHOLOGY STATISTICS FOR THIS SPINE:DENDRITE PAIR
+    % ---------------------------------------
+    
+    % ROISAVES : saved inside individual MORPHO() functions
+    
+    MORPHdata{ROInum} = {SPINE, SPINEHN, DENDRITE};
+    
+    
+    % ---------------------------------------
+    % QUESTION DIALOGUE TO KEEP DRAWING OR END
+    % ---------------------------------------
+            
+    doagainROI = questdlg('Select next ROI?', 'Select next ROI?', 'Yes', 'No', 'No');
+    switch doagainROI
+       case 'Yes'
+            set(ROIIDh,'String',num2str((str2num(ROIIDh.String)+1)) );
+            getROI
+       case 'No'
+           set(ROIIDh,'String',num2str((str2num(ROIIDh.String)+1)) );
+           % keyboard
+    end
+
+    set(gcf,'Pointer','arrow')
+
+end
 
 
 
+
+
+
+%----------------------------------------------------
+%        QUANTIFY Spine Total Area
+%----------------------------------------------------
+function MORPHOa(ROInum)
+
+
+    % ------  
+    disp('Draw outline around entire spine')
+    memos(1:end-1) = memos(2:end);
+    memos{end} = 'Draw outline around entire spine';
+    memoboxH.String = memos;
+    pause(.02)
+    % ------
+    
+    
+    hROI = imfreehand(haxCCD);
+
+    ROImask = hROI.createMask(phCCD);
+    ROIpos = hROI.getPosition;
+    ROIarea = polyarea(ROIpos(:,1),ROIpos(:,2));
+
+    ROI_INTENSITY = IMG .* ROImask;
+
+    ROI_INTENSITY_MEAN = mean(ROI_INTENSITY(ROI_INTENSITY > 0));
+
+    SPINE.area = ROIarea;
+    SPINE.intensity = ROI_INTENSITY_MEAN;
+
+
+    fprintf('\n TOTAL SPINE INTENSITY: % 5.5g \n TOTAL SPINE AREA: % 5.5g \n\n',...
+                ROI_INTENSITY_MEAN,ROIarea)
+
+    ROISAVES(ROInum).SpineMask = ROImask;
+    ROISAVES(ROInum).SpinePos = ROIpos;
+
+
+end
+
+
+
+
+
+%----------------------------------------------------
+%        QUANTIFY Spine Total Length
+%----------------------------------------------------
+function MORPHOb(ROInum)
+
+    % ------  
+    disp('Draw line from dendritic shaft to spine tip (longest extent of spine)')
+    memos(1:end-1) = memos(2:end);
+    memos{end} = 'Draw line from spine head tip to dendrite';
+    memoboxH.String = memos;
+    pause(.02)
+    % ------
+    
+	hline = imline(haxCCD);
+	dpos = hline.getPosition(); 
+
+	spineextent = sqrt((dpos(1,1)-dpos(2,1))^2 + (dpos(1,2)-dpos(2,2))^2);
+
+    spineextentcenter = [mean(dpos(:,1)) mean(dpos(:,2))];
+        scatter(spineextentcenter(1),spineextentcenter(2), cdotsz,...
+        'MarkerFaceColor', 'none', 'MarkerEdgeColor', [1 0 0], 'LineWidth', 3)
+
+    
+    [cx,cy,c] = improfile(IMG, dpos(:,1), dpos(:,2), round(spineextent));
+    
+        % sqrt((cx(1)-cx(end))^2 + (cy(1)-cy(end))^2)
+        scatter(cx,cy, dotsz,'MarkerFaceColor', [1 0 0])
+    
+    SPINEHN.spineextent = spineextent;
+    SPINEHN.spineextentintensity = mean(c);
+    SPINEHN.spineextentintensityprofile = c;
+    SPINEHN.spineextentcenter = spineextentcenter;
+    
+    ROISAVES(ROInum).SpineExtentPos = dpos;
+    ROISAVES(ROInum).SpineExtentCenter = spineextentcenter;
+    ROISAVES(ROInum).SpineExtentX = cx;
+    ROISAVES(ROInum).SpineExtentY = cy;
+
+    
+    % ------ Plot F Profile ----
+    plot(haxPRE, c)
+    axes(haxCCD)
+    % --------------------------
+
+end
+
+
+
+
+
+%----------------------------------------------------
+%        QUANTIFY Spine Head Diameter
+%----------------------------------------------------
+function MORPHOc(ROInum)
+    
+    % ------  
+    disp('Draw line across spine-head parallel to dendritic shaft')
+    memos(1:end-1) = memos(2:end);
+    memos{end} = 'Draw line across spine-head width';
+    memoboxH.String = memos;
+    pause(.02)
+    % ------
+    
+	hline = imline(haxCCD);
+	dpos = hline.getPosition(); 
+
+	spineheadwidth = sqrt((dpos(1,1)-dpos(2,1))^2 + (dpos(1,2)-dpos(2,2))^2);
+
+    spineheadcenter = [mean(dpos(:,1)) mean(dpos(:,2))];
+        scatter(spineheadcenter(1),spineheadcenter(2), cdotsz,...
+        'MarkerFaceColor', 'none', 'MarkerEdgeColor', [1 0 1], 'LineWidth', 3)
+
+    
+    [cx,cy,c] = improfile(IMG, dpos(:,1), dpos(:,2), round(spineheadwidth));
+    
+        % sqrt((cx(1)-cx(end))^2 + (cy(1)-cy(end))^2)
+        scatter(cx,cy, dotsz,'MarkerFaceColor', [1 0 1])
+    
+    SPINEHN.headwidth = spineheadwidth;
+    SPINEHN.headintensity = mean(c);
+    SPINEHN.headintensityprofile = c;
+    SPINEHN.headcenter = spineheadcenter;
+    
+    ROISAVES(ROInum).SpineHeadPos = dpos;
+    ROISAVES(ROInum).SpineHeadCenter = spineheadcenter;
+    ROISAVES(ROInum).SpineHeadX = cx;
+    ROISAVES(ROInum).SpineHeadY = cy;
+    
+    % ------ Plot F Profile ----
+    plot(haxPRE, c)
+    axes(haxCCD)
+    % --------------------------
+
+end
+
+
+
+
+%----------------------------------------------------
+%        QUANTIFY Spine Neck Length
+%----------------------------------------------------
+function MORPHOd(ROInum)
+    
+    % ------
+    disp('Draw line along length of spine neck')
+    memos(1:end-1) = memos(2:end);
+    memos{end} = 'Draw line along length of spine neck';
+    memoboxH.String = memos;
+    pause(.02)
+    % ------
+    
+	hline = imline(haxCCD);
+	dpos = hline.getPosition(); 
+
+	spinenecklength = sqrt((dpos(1,1)-dpos(2,1))^2 + (dpos(1,2)-dpos(2,2))^2);
+
+    spineneckcenter = [mean(dpos(:,1)) mean(dpos(:,2))];
+        scatter(spineneckcenter(1),spineneckcenter(2), cdotsz,...
+        'MarkerFaceColor', 'none', 'MarkerEdgeColor', [0 1 0], 'LineWidth', 3)
+
+    
+    [cx,cy,c] = improfile(IMG, dpos(:,1), dpos(:,2), round(spinenecklength));
+    
+        % sqrt((cx(1)-cx(end))^2 + (cy(1)-cy(end))^2)
+        scatter(cx,cy, dotsz,'MarkerFaceColor', [0 1 0])
+    
+    SPINEHN.necklength = spinenecklength;
+    SPINEHN.neckintensity = mean(c);
+    SPINEHN.neckintensityprofile = c;
+    SPINEHN.neckcenter = spineneckcenter;
+    
+    ROISAVES(ROInum).SpineNeckPos = dpos;
+    ROISAVES(ROInum).SpineNeckCenter = spineneckcenter;
+    ROISAVES(ROInum).SpineNeckX = cx;
+    ROISAVES(ROInum).SpineNeckY = cy;
+    
+    % ------ Plot F Profile ----
+    plot(haxPRE, c)
+    axes(haxCCD)
+    % --------------------------
+
+end
+
+
+
+
+%----------------------------------------------------
+%        QUANTIFY Dendritic Shaft Diameter
+%----------------------------------------------------
+function MORPHOe(ROInum)
+
+    disp('Draw line across dendrite region adjacent to spine')
+    memos(1:end-1) = memos(2:end);
+    memos{end} = 'Draw line across dendrite diameter connecting to spine';
+    memoboxH.String = memos;
+    pause(.02)
+    % ------
+
+	hline = imline(haxCCD);
+	dpos = hline.getPosition(); 
+      % row 1 of dpos is the x,y pos of the line origin
+      % test this using scatter(dpos(1,1),dpos(1,2),'r')
+    
+	dendritesize = sqrt((dpos(1,1)-dpos(2,1))^2 + (dpos(1,2)-dpos(2,2))^2);
+
+    dendritecenter = [mean(dpos(:,1)) mean(dpos(:,2))];
+        scatter(dendritecenter(1),dendritecenter(2), cdotsz,...
+        'MarkerFaceColor', 'none', 'MarkerEdgeColor', [0 0 1], 'LineWidth', 3)
+
+    
+    [cx,cy,c] = improfile(IMG, dpos(:,1), dpos(:,2), round(dendritesize));
+    
+        % sqrt((cx(1)-cx(end))^2 + (cy(1)-cy(end))^2)
+        scatter(cx,cy, dotsz,'MarkerFaceColor', [0 0 1])
+    
+    DENDRITE.size = dendritesize;
+    DENDRITE.intensity = mean(c);
+    DENDRITE.intensityprofile = c;
+    DENDRITE.center = dendritecenter;
+    
+    ROISAVES(ROInum).DendritePos = dpos;
+    ROISAVES(ROInum).DendriteCenter = dendritecenter;
+    ROISAVES(ROInum).DendriteX = cx;
+    ROISAVES(ROInum).DendriteY = cy;
+    
+    
+    % ------ Plot F Profile ----
+    plot(haxPRE, c)
+    axes(haxCCD)
+    % --------------------------
+    
+end
+
+
+
+
+%----------------------------------------------------
+%        QUANTIFY Nearest Neighbor Spine
+%----------------------------------------------------
+function MORPHOf(ROInum)
+    
+    % ------
+    disp('Connect line from this spine to nearest spine ')
+    memos(1:end-1) = memos(2:end);
+    memos{end} = ' Connect line from ROI spine to nearest spine';
+    memoboxH.String = memos;
+    pause(.02)
+    % ------
+    
+	hline = imline(haxCCD);
+	dpos = hline.getPosition(); 
+
+	nearestspine = sqrt((dpos(1,1)-dpos(2,1))^2 + (dpos(1,2)-dpos(2,2))^2);
+
+    nearestspinecenter = [mean(dpos(:,1)) mean(dpos(:,2))];
+        scatter(nearestspinecenter(1),nearestspinecenter(2), cdotsz,...
+        'MarkerFaceColor', 'none', 'MarkerEdgeColor', [0 1 0], 'LineWidth', 3)
+
+    
+    [cx,cy,c] = improfile(IMG, dpos(:,1), dpos(:,2), round(nearestspine));
+    
+        % sqrt((cx(1)-cx(end))^2 + (cy(1)-cy(end))^2)
+        scatter(cx,cy, dotsz,'MarkerFaceColor', [0 1 0])
+    
+    DENDRITE.nearestspine = nearestspine;
+    DENDRITE.nearestspineint = mean(c);
+    DENDRITE.nearestspineprofile = c;
+    DENDRITE.nearestspinecenter = nearestspinecenter;
+    
+    ROISAVES(ROInum).SpineNearPos = dpos;
+    ROISAVES(ROInum).SpineNearCenter = nearestspinecenter;
+    ROISAVES(ROInum).SpineNearX = cx;
+    ROISAVES(ROInum).SpineNearY = cy;
+     
+    
+    % ------ Plot F Profile ----
+    plot(haxPRE, c)
+    axes(haxCCD)
+    % --------------------------
+
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%----------------------------------------------------
+%        KEYBOARD CALLBACKS (ZOOM + PAN)
+%----------------------------------------------------
 function keypresszoom(hObject, eventData, key)
     
     
@@ -885,6 +1334,11 @@ end
 
 
 
+
+
+%----------------------------------------------------
+%        BOX SELECTION
+%----------------------------------------------------
 function boxselection(source,callbackdata)
     
     % callbackdata.OldValue.String
@@ -894,6 +1348,11 @@ end
 
 
 
+
+
+%----------------------------------------------------
+%        LOAD FILE
+%----------------------------------------------------
 function loadfile()
 %Load file triggers uiresume; the initial menu is set to invisible. Prompts
 %user for file to load, copies the datastack from the file; sets the image 
@@ -973,6 +1432,11 @@ end
 
 
 
+
+
+%----------------------------------------------------
+%        SAVE DATA AND ROI COORDINATES
+%----------------------------------------------------
 function saveFile(savefileh, eventData)
     
     
@@ -1041,6 +1505,8 @@ MORPHdata = MORPHdata(~cellfun(@isempty, MORPHdata));
     end
     
     
+    
+    
     MORPHtab = array2table(MORPHdat);
     MORPHtab.Properties.VariableNames = {...
         'SPINE_AREA' 'SPINE_F' 'SPINE_LEN' 'SPINE_LEN_F' ...
@@ -1065,6 +1531,9 @@ MORPHdata = MORPHdata(~cellfun(@isempty, MORPHdata));
 
 
 end
+
+
+
 
 
 %----------------------------------------------------
