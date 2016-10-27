@@ -59,16 +59,12 @@ cd(thisfilepath);
 
 fprintf('\n\n Current working path set to: \n % s \n', thisfilepath)
 
-% global isbrad
-% upath = userpath;
-% isbrad = strcmp('/Users/bradleymonk',upath(1:18));
-    
-    pathdir0 = thisfilepath;
-    pathdir1 = [thisfilepath '/neuromorphdata'];
-    
-    gpath = [pathdir0 ':' pathdir1];
-    
-    addpath(gpath)
+pathdir0 = thisfilepath;
+pathdir1 = [thisfilepath '/neuromorphdata'];
+
+gpath = [pathdir0 ':' pathdir1];
+
+addpath(gpath)
 
 fprintf('\n\n Added folders to path: \n % s \n % s \n % s \n % s \n\n',...
         pathdir0,pathdir1)
@@ -82,11 +78,6 @@ global datadir datafile datadate
 datadir = '';
 datafile = '';
 datadate = '';
-
-
-datadir = '/Users/bradleymonk/Documents/MATLAB/myToolbox/LAB/neuromorph/neuromorphdata/organotypic/GoodPix';
-datafile = 'dendrite2.tif';
-datadate = '20160902';
 
 global imgpath
 imgpath = '';
@@ -346,149 +337,6 @@ loadfile()
 
 axes(haxCCD)
 
-%{
-% memoboxH = uicontrol('Parent',memopanelH, 'Style','Edit', 'Units','normalized', ...
-%         'Max',6,'Min',0,'FontSize', 11, ...
-%         'String','Welcome to Neuromorph', ...
-%         'Position', [.05 .05 .90 .90]);             
-
-        
-        
-% boxtypeh = uibuttongroup('Parent', IPpanelH, 'Visible','off',...
-%                   'Units', 'normalized',...
-%                   'Position',[0.05 0.55 0.90 0.20],...
-%                   'SelectionChangedFcn',@boxselection);
-%               
-% % Create three radio buttons in the button group.
-% boxtypeh1 = uicontrol(boxtypeh,'Style','radiobutton',...
-%                   'String','freehand',...
-%                   'Units', 'normalized',...
-%                   'Position',[0.05 0.05 0.3 0.9],...
-%                   'HandleVisibility','off');
-%               
-% boxtypeh2 = uicontrol(boxtypeh,'Style','radiobutton',...
-%                   'String','rectangle',...
-%                   'Units', 'normalized',...
-%                   'Position',[0.35 0.05 0.3 0.9],...
-%                   'HandleVisibility','off');
-% 
-% boxtypeh3 = uicontrol(boxtypeh,'Style','radiobutton',...
-%                   'String','elipse',...
-%                   'Units', 'normalized',...
-%                   'Position',[0.65 0.05 0.3 0.9],...
-%                   'HandleVisibility','off');
-% boxtypeh.Visible = 'on';
-
-
-% resetROISh = uicontrol('Parent', IPpanelH, 'Units', 'normalized', ...
-%     'Position', [0.05 0.10 0.40 0.15], 'String', 'Reset all ROIs', 'FontSize', 11,...
-%     'Callback', @resetROIS);
-% 
-% 
-% 
-% dendszh = uicontrol('Parent', IPpanelH, 'Units', 'normalized', ...
-%     'Position', [0.55 0.10 0.40 0.15], 'String', 'Get Dendrite Size', 'FontSize', 11,...
-%     'Callback', @getdendsize);
-% 
-
-
-
-
-%----------------------------------------------------
-%           DATA I/O PANEL
-%----------------------------------------------------
-% IOpanelH = uipanel('Title','Data I/O ','FontSize',10,...
-%     'BackgroundColor',[.95 .95 .95],...
-%     'Position', [0.62 0.35 0.30 0.30]); % 'Visible', 'Off',
-% 
-% lifetimeviewerh = uicontrol('Parent', IOpanelH, 'Units', 'normalized', ...
-%     'Position', [0.05 0.80 0.40 0.15], 'String', 'Explore Image', 'FontSize', 11,...
-%     'Callback', @lifetimeviewer);
-% 
-% 
-% closeimagesh = uicontrol('Parent', IOpanelH, 'Units', 'normalized', ...
-%     'Position', [0.55 0.80 0.40 0.15], 'FontSize', 11, 'String', 'Close Windows',...
-%     'Callback', @closelftintenw);
-% 
-% 
-% savefileh = uicontrol('Parent', IOpanelH, 'Units', 'normalized', ...
-%     'Position', [0.05 0.50 0.90 0.25], 'String', 'Save File', 'FontSize', 11,...
-%     'Callback', @saveFile);
-%         
-%}
-
-
-%{
-% setintenh = uicontrol('Parent', mainguih, 'Units', 'normalized', ...
-%     'Position', [0.70 0.72 0.12 0.04], 'FontSize', 11, 'String', 'Set intensity',...
-%     'Callback', @setinten);
-% 
-% 
-% dftintenh = uicontrol('Parent', mainguih, 'Units', 'normalized', ...
-%     'Position', [0.85 0.72 0.12 0.04], 'FontSize', 11,...
-%     'String', 'Default intensities','Callback', @defaultinten);
-% 
-% 
-% intThreshMinh = uicontrol('Parent', mainguih, 'Style', 'Text', 'Units', 'normalized', ...
-%     'Position', [0.70 0.668 0.12 0.04], 'FontSize', 11, 'String', 'Min Intensity');
-% intThreshMin = uicontrol('Parent', mainguih, 'Style', 'Edit', 'FontSize', 11, 'Units', 'normalized', ...
-%     'Position', [0.70 0.64 0.12 0.04]);
-% 
-% intThreshMaxh = uicontrol('Parent', mainguih, 'Style', 'Text', 'Units', 'normalized', ...
-%     'Position', [0.85 0.668 0.12 0.04], 'FontSize', 11, 'String', 'Max Intensity');
-% intThreshMax = uicontrol('Parent', mainguih, 'Style', 'Edit', 'FontSize', 11, 'Units', 'normalized', ...
-%     'Position', [0.85 0.64 0.12 0.04]);
-% 
-% 
-% lifetimethresholdh = uicontrol('Parent', mainguih, 'Style', 'Text',  'Units', 'normalized',...
-%     'Position', [0.70 0.49 0.12 0.04], 'FontSize', 11, 'String', 'Lifetime Min');
-% lftthresholdMINh = uicontrol('Parent', mainguih, 'Style', 'Edit',  'Units', 'normalized',...
-%     'Position', [0.70 0.46 0.12 0.04], 'FontSize', 11);
-% 
-% 
-% lifetimethreshMAXh = uicontrol('Parent', mainguih, 'Style', 'Text',  'Units', 'normalized',...
-%     'Position', [0.85 0.49 0.12 0.04], 'FontSize', 11, 'String', 'Lifetime Max');
-% lftthresholdMAXh = uicontrol('Parent', mainguih, 'Style', 'Edit',  'Units', 'normalized',...
-%     'Position', [0.85 0.46 0.12 0.04], 'FontSize', 11);
-% 
-% 
-% 
-% chithresholdminh = uicontrol('Parent', mainguih, 'Style', 'Text',  'Units', 'normalized',...
-%     'Position', [0.70 0.33 0.12 0.04], 'FontSize', 11, 'String', 'Chi Min');
-% chiminh = uicontrol('Parent', mainguih, 'Style', 'Edit',  'Units', 'normalized', ...
-%     'Position', [0.70 0.30 0.12 0.04], 'FontSize', 11);
-% 
-% 
-% chithresholdmaxh = uicontrol('Parent', mainguih, 'Style', 'Text',  'Units', 'normalized', ...
-%     'Position', [0.85 0.33 0.12 0.04], 'FontSize', 11, 'String', 'Chi Max');
-% chimaxh = uicontrol('Parent', mainguih, 'Style', 'Edit',  'Units', 'normalized', ...
-%     'Position', [0.85 0.30 0.12 0.04], 'FontSize', 11);
-% 
-% 
-% magnifh = uicontrol('Parent', mainguih, 'Style', 'Text',  'Units', 'normalized', ...
-%     'Position', [0.70 0.58 0.12 0.04], 'FontSize', 11, 'String', 'Magnification');
-% magh = uicontrol('Parent', mainguih, 'Style', 'Edit',  'Units', 'normalized', ...
-%     'Position', [0.70 0.555 0.12 0.04], 'FontSize', 11);
-
-
-
-
-
-% hSP = imscrollpanel(mainguih,phCCD);
-% set(hSP,'Units','normalized','Position',[0 .1 1 .9])
-% 
-% hMagBox = immagbox(mainguih,phCCD);
-% pos = get(hMagBox,'Position');
-% set(hMagBox,'Position',[0 0 pos(3) pos(4)])
-% imoverview(phCCD)
-%}
-
-
-
-
-
-
-
 % -----------------------------------------------------------------------------
 %%                     GUI TOOLBOX FUNCTIONS
 % -----------------------------------------------------------------------------
@@ -496,368 +344,10 @@ axes(haxCCD)
 
 
 
+
 %----------------------------------------------------
 %        QUANTIFY SPINE ROI
 %----------------------------------------------------
-%{
-function getROI(boxidselecth, eventdata)
-
-    ROInum = str2num(ROIIDh.String);
-
-%     if strcmp(boxtype,'rectangle')
-%         hROI = imrect(haxCCD);
-%     elseif strcmp(boxtype,'elipse')
-%         hROI = imellipse(haxCCD);
-%     else % strcmp(boxtype,'freehand')
-%         hROI = imfreehand(haxCCD);
-%     end
-
-
-
-%     if checkbox1H.Value
-%         smoothimg
-%     end
-%     
-%     if checkbox2H.Value
-%         cropimg
-%     end
-%     
-%     if checkbox3H.Value
-%         imgblocks
-%     end
-% 
-%     if checkbox4H.Value
-%         reshapeData
-%     end
-% 
-%     if checkbox5H.Value
-%         alignCSframes
-%     end
-% 
-%     if checkbox6H.Value
-%         dFoverF
-%     end
-% 
-%     if checkbox7H.Value
-%         timepointMeans
-%     end
-
-
-    dotsz = 30;
-    cdotsz = 150;
-    
-    % ---------------------------------------
-    % GET SPINE TOTAL AREA MORPHOLOGY STATISTICS
-    % ---------------------------------------
-    
-    % ------  
-    disp('Draw outline around entire spine')
-    memos(1:end-1) = memos(2:end);
-    memos{end} = 'Draw outline around entire spine';
-    memoboxH.String = memos;
-    pause(.02)
-    % ------
-    
-    
-    hROI = imfreehand(haxCCD);
-
-    ROImask = hROI.createMask(phCCD);
-    ROIpos = hROI.getPosition;
-    ROIarea = polyarea(ROIpos(:,1),ROIpos(:,2));
-
-    ROI_INTENSITY = IMG .* ROImask;
-
-    ROI_INTENSITY_MEAN = mean(ROI_INTENSITY(ROI_INTENSITY > 0));
-
-    SPINE.area = ROIarea;
-    SPINE.intensity = ROI_INTENSITY_MEAN;
-
-
-    fprintf('\n TOTAL SPINE INTENSITY: % 5.5g \n TOTAL SPINE AREA: % 5.5g \n\n',...
-                ROI_INTENSITY_MEAN,ROIarea)
-%
-
-
-% ROISAVES(ROInum).SpineROI = hROI;
-ROISAVES(ROInum).SpineMask = ROImask;
-ROISAVES(ROInum).SpinePos = ROIpos;
-
-
-    % ---------------------------------------
-    % GET SPINE-HEAD:NECK MORPHOLOGY STATISTICS
-    % ---------------------------------------
-    % row 1 of dpos is the x,y pos of the line origin
-    % test this using scatter(dpos(1,1),dpos(1,2),'r')
-      
-    % ------  
-    disp('Draw line from dendritic shaft to spine tip (longest extent of spine)')
-    memos(1:end-1) = memos(2:end);
-    memos{end} = 'Draw line from spine head tip to dendrite';
-    memoboxH.String = memos;
-    pause(.02)
-    % ------
-    
-	hline = imline(haxCCD);
-	dpos = hline.getPosition(); 
-
-	spineextent = sqrt((dpos(1,1)-dpos(2,1))^2 + (dpos(1,2)-dpos(2,2))^2);
-
-    spineextentcenter = [mean(dpos(:,1)) mean(dpos(:,2))];
-        scatter(spineextentcenter(1),spineextentcenter(2), cdotsz,...
-        'MarkerFaceColor', 'none', 'MarkerEdgeColor', [1 0 0], 'LineWidth', 3)
-
-    
-    [cx,cy,c] = improfile(IMG, dpos(:,1), dpos(:,2), round(spineextent));
-    
-        % sqrt((cx(1)-cx(end))^2 + (cy(1)-cy(end))^2)
-        scatter(cx,cy, dotsz,'MarkerFaceColor', [1 0 0])
-    
-    SPINEHN.spineextent = spineextent;
-    SPINEHN.spineextentintensity = mean(c);
-    SPINEHN.spineextentintensityprofile = c;
-    SPINEHN.spineextentcenter = spineextentcenter;
-    
-    % ROISAVES(ROInum).SpineExtentLine = hline;
-    ROISAVES(ROInum).SpineExtentPos = dpos;
-    ROISAVES(ROInum).SpineExtentCenter = spineextentcenter;
-    ROISAVES(ROInum).SpineExtentX = cx;
-    ROISAVES(ROInum).SpineExtentY = cy;
-
-    
-    % ------ Plot F Profile ----
-    plot(haxPRE, c)
-    axes(haxCCD)
-    % --------------------------
-    
-    
-    
-    % ------  
-    disp('Draw line across spine-head parallel to dendritic shaft')
-    memos(1:end-1) = memos(2:end);
-    memos{end} = 'Draw line across spine-head width';
-    memoboxH.String = memos;
-    pause(.02)
-    % ------
-    
-	hline = imline(haxCCD);
-	dpos = hline.getPosition(); 
-
-	spineheadwidth = sqrt((dpos(1,1)-dpos(2,1))^2 + (dpos(1,2)-dpos(2,2))^2);
-
-    spineheadcenter = [mean(dpos(:,1)) mean(dpos(:,2))];
-        scatter(spineheadcenter(1),spineheadcenter(2), cdotsz,...
-        'MarkerFaceColor', 'none', 'MarkerEdgeColor', [1 0 1], 'LineWidth', 3)
-
-    
-    [cx,cy,c] = improfile(IMG, dpos(:,1), dpos(:,2), round(spineheadwidth));
-    
-        % sqrt((cx(1)-cx(end))^2 + (cy(1)-cy(end))^2)
-        scatter(cx,cy, dotsz,'MarkerFaceColor', [1 0 1])
-    
-    SPINEHN.headwidth = spineheadwidth;
-    SPINEHN.headintensity = mean(c);
-    SPINEHN.headintensityprofile = c;
-    SPINEHN.headcenter = spineheadcenter;
-    
-%     ROISAVES(ROInum).SpineHeadLine = hline;
-    ROISAVES(ROInum).SpineHeadPos = dpos;
-    ROISAVES(ROInum).SpineHeadCenter = spineheadcenter;
-    ROISAVES(ROInum).SpineHeadX = cx;
-    ROISAVES(ROInum).SpineHeadY = cy;
-    
-    % ------ Plot F Profile ----
-    plot(haxPRE, c)
-    axes(haxCCD)
-    % --------------------------
-    
-    
-    % ------
-    disp('Draw line along length of spine neck')
-    memos(1:end-1) = memos(2:end);
-    memos{end} = 'Draw line along length of spine neck';
-    memoboxH.String = memos;
-    pause(.02)
-    % ------
-    
-	hline = imline(haxCCD);
-	dpos = hline.getPosition(); 
-
-	spinenecklength = sqrt((dpos(1,1)-dpos(2,1))^2 + (dpos(1,2)-dpos(2,2))^2);
-
-    spineneckcenter = [mean(dpos(:,1)) mean(dpos(:,2))];
-        scatter(spineneckcenter(1),spineneckcenter(2), cdotsz,...
-        'MarkerFaceColor', 'none', 'MarkerEdgeColor', [0 1 0], 'LineWidth', 3)
-
-    
-    [cx,cy,c] = improfile(IMG, dpos(:,1), dpos(:,2), round(spinenecklength));
-    
-        % sqrt((cx(1)-cx(end))^2 + (cy(1)-cy(end))^2)
-        scatter(cx,cy, dotsz,'MarkerFaceColor', [0 1 0])
-    
-    SPINEHN.necklength = spinenecklength;
-    SPINEHN.neckintensity = mean(c);
-    SPINEHN.neckintensityprofile = c;
-    SPINEHN.neckcenter = spineneckcenter;
-    
-%     ROISAVES(ROInum).SpineNeckLine = hline;
-    ROISAVES(ROInum).SpineNeckPos = dpos;
-    ROISAVES(ROInum).SpineNeckCenter = spineneckcenter;
-    ROISAVES(ROInum).SpineNeckX = cx;
-    ROISAVES(ROInum).SpineNeckY = cy;
-    
-    % ------ Plot F Profile ----
-    plot(haxPRE, c)
-    axes(haxCCD)
-    % --------------------------
-    
-    disp(['SPINE HEAD WIDTH:' num2str(SPINEHN.headwidth)])
-    disp(['SPINE NECK LENGTH:' num2str(SPINEHN.necklength)])
-
-    % ---------------------------------------
-    % GET DENDRITE MORPHOLOGY STATISTICS
-    % ---------------------------------------
-
-    disp('Draw line across dendrite region adjacent to spine')
-    memos(1:end-1) = memos(2:end);
-    memos{end} = 'Draw line across dendrite diameter connecting to spine';
-    memoboxH.String = memos;
-    pause(.02)
-    % ------
-
-	hline = imline(haxCCD);
-	dpos = hline.getPosition(); 
-      % row 1 of dpos is the x,y pos of the line origin
-      % test this using scatter(dpos(1,1),dpos(1,2),'r')
-    
-	dendritesize = sqrt((dpos(1,1)-dpos(2,1))^2 + (dpos(1,2)-dpos(2,2))^2);
-
-    dendritecenter = [mean(dpos(:,1)) mean(dpos(:,2))];
-        scatter(dendritecenter(1),dendritecenter(2), cdotsz,...
-        'MarkerFaceColor', 'none', 'MarkerEdgeColor', [0 0 1], 'LineWidth', 3)
-
-    
-    [cx,cy,c] = improfile(IMG, dpos(:,1), dpos(:,2), round(dendritesize));
-    
-        % sqrt((cx(1)-cx(end))^2 + (cy(1)-cy(end))^2)
-        scatter(cx,cy, dotsz,'MarkerFaceColor', [0 0 1])
-    
-    DENDRITE.size = dendritesize;
-    DENDRITE.intensity = mean(c);
-    DENDRITE.intensityprofile = c;
-    DENDRITE.center = dendritecenter;
-    
-%     ROISAVES(ROInum).DendriteLine = hline;
-    ROISAVES(ROInum).DendritePos = dpos;
-    ROISAVES(ROInum).DendriteCenter = dendritecenter;
-    ROISAVES(ROInum).DendriteX = cx;
-    ROISAVES(ROInum).DendriteY = cy;
-    
-    disp(['DENDRITE SIZE:' num2str(dendritesize)])
-    
-    % ------ Plot F Profile ----
-    plot(haxPRE, c)
-    axes(haxCCD)
-    % --------------------------
-    
-    
-    
-    % ------
-    disp('Connect line from this spine to nearest spine ')
-    memos(1:end-1) = memos(2:end);
-    memos{end} = ' Connect line from ROI spine to nearest spine';
-    memoboxH.String = memos;
-    pause(.02)
-    % ------
-    
-	hline = imline(haxCCD);
-	dpos = hline.getPosition(); 
-
-	nearestspine = sqrt((dpos(1,1)-dpos(2,1))^2 + (dpos(1,2)-dpos(2,2))^2);
-
-    nearestspinecenter = [mean(dpos(:,1)) mean(dpos(:,2))];
-        scatter(nearestspinecenter(1),nearestspinecenter(2), cdotsz,...
-        'MarkerFaceColor', 'none', 'MarkerEdgeColor', [0 1 0], 'LineWidth', 3)
-
-    
-    [cx,cy,c] = improfile(IMG, dpos(:,1), dpos(:,2), round(nearestspine));
-    
-        % sqrt((cx(1)-cx(end))^2 + (cy(1)-cy(end))^2)
-        scatter(cx,cy, dotsz,'MarkerFaceColor', [0 1 0])
-    
-    DENDRITE.nearestspine = nearestspine;
-    DENDRITE.nearestspineint = mean(c);
-    DENDRITE.nearestspineprofile = c;
-    DENDRITE.nearestspinecenter = nearestspinecenter;
-    
-    
-%     ROISAVES(ROInum).SpineNearLine = hline;
-    ROISAVES(ROInum).SpineNearPos = dpos;
-    ROISAVES(ROInum).SpineNearCenter = nearestspinecenter;
-    ROISAVES(ROInum).SpineNearX = cx;
-    ROISAVES(ROInum).SpineNearY = cy;
-     
-    
-    % ------ Plot F Profile ----
-    plot(haxPRE, c)
-    axes(haxCCD)
-    % --------------------------
-
-    
-    spf1 = sprintf(['\n TOTAL SPINE INTENSITY: % 5.3f '...
-     '\n TOTAL SPINE AREA:      % 5.1f '...
-     '\n SPINE HEAD WIDTH:      % 5.1f '...
-     '\n SPINE NECK LENGTH:     % 5.1f '...
-     '\n NEAREST SPINE DIST:    % 5.1f '...
-     '\n DENDRITE DIAMETER:     % 5.1f '...
-     '\n DENDRITE INTENSITY:    % 5.3f \n\n'],...
-        ROI_INTENSITY_MEAN,ROIarea,...
-        SPINEHN.headwidth,SPINEHN.necklength,...
-        DENDRITE.nearestspine,...
-        DENDRITE.size, DENDRITE.intensity);
-    disp(spf1)
-    
-    % ------
-    memos(1:end-1) = memos(2:end);     
-    memos{3} = ['TOTAL SPINE INTENSITY: ' num2str(ROI_INTENSITY_MEAN)];
-    memos{4} = ['TOTAL SPINE AREA: '      num2str(ROIarea)];
-    memos{5} = ['SPINE HEAD WIDTH: '      num2str(SPINEHN.headwidth)];
-    memos{6} = ['SPINE NECK LENGTH: '     num2str(SPINEHN.necklength)];
-    memos{7} = ['DENDRITE DIAMETER: '     num2str(DENDRITE.size)];
-    memos{8} = ['DENDRITE INTENSITY: '    num2str(DENDRITE.intensity)];
-    memos{9} = ['NEAREST SPINE DIST: '    num2str(DENDRITE.nearestspine)];
-    memos{end} = ' ';
-    memoboxH.String = memos;
-    pause(.02)
-    % ------
-    
-    
-    % ---------------------------------------
-    % SAVE MORPHOLOGY STATISTICS FOR THIS SPINE:DENDRITE PAIR
-    % ---------------------------------------
-    
-
-    
-    MORPHdata{ROInum} = {SPINE, SPINEHN, DENDRITE};
-    
-    
-    % ---------------------------------------
-    % QUESTION DIALOGUE TO KEEP DRAWING OR END
-    % ---------------------------------------
-            
-    doagainROI = questdlg('Select next ROI?', 'Select next ROI?', 'Yes', 'No', 'No');
-    switch doagainROI
-       case 'Yes'
-            set(ROIIDh,'String',num2str((str2num(ROIIDh.String)+1)) );
-            getROI
-       case 'No'
-           set(ROIIDh,'String',num2str((str2num(ROIIDh.String)+1)) );
-           % keyboard
-    end
-
-    set(gcf,'Pointer','arrow')
-
-end
-%}
 function getROI(boxidselecth, eventdata)
 
     ROInum = str2num(ROIIDh.String);
@@ -1237,28 +727,6 @@ end
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 %----------------------------------------------------
 %        KEYBOARD CALLBACKS (ZOOM + PAN)
 %----------------------------------------------------
@@ -1511,14 +979,16 @@ MORPHdata = MORPHdata(~cellfun(@isempty, MORPHdata));
     MORPHtab.Properties.VariableNames = {...
         'SPINE_AREA' 'SPINE_F' 'SPINE_LEN' 'SPINE_LEN_F' ...
         'HEAD_WIDTH' 'HEAD_F' 'NECK_LENGTH' 'NECK_F'...
-        'DEND_DIAMETER' 'DEND_F' 'NEARBY_SPINE_DIST' 'NEARBY_SPINE_FPROF'...
+        'DEND_DIAMETER' 'DEND_DIAMETER_F' 'NEARBY_SPINE_DIST' 'LENGTH_SHAFT_F'...
         };
     
     
     MORPHtab.Properties.RowNames = ROInames;
     
+    
+    
     MORPHtab.FILE = repmat(datafile,size(MORPHdata,2),1);
-    MORPHtab.DATE = repmat(datadate,size(MORPHdata,2),1);
+    % MORPHtab.DATE = repmat(datadate,size(MORPHdata,2),1);
     
     
     writetable(MORPHtab,[Datafilename '.csv'],'WriteRowNames',true)
@@ -1630,71 +1100,6 @@ end
 
 
 
-
-
-
-%{
-function saveFile(savefileh, eventData)
-
-        
-    cd(datadir);
-
-    saveDatafilename = inputdlg('Enter a filename to save data','file name',1,...
-                                {datafile(1:end-4)});
-
-    Datafilename = char(strcat(saveDatafilename));
-
-    maglevel = str2double(magh.String);
-    
-    if numel(dpos) < 1; % If dendrite size was manually selected, numel(dpos) > 1
-        dendritesize = maglevel*5;
-    end
-    
-    
-    for nn = 1:size(MORPHdata,2)
-        
-        VxD = MORPHdata{1,nn}{7} ./ (.5 .* dendritesize).^2;
-        
-        dVOL = VxD .* 0;
-        
-        MORPHdat(nn,:) = [MORPHdata{1,nn}{4:7} maglevel dendritesize VxD dVOL];        
-        ROInames{nn} = num2str(nn);        
-    end
-    
-    
-    
-    MORPHtab = array2table(MORPHdat);
-    MORPHtab.Properties.VariableNames = {'LIFETIME' 'INTENSITY' 'CHISQR' 'VOLUME' ...
-                                        'MAG' 'DSIZE' 'VxD' 'dVOL'};
-    MORPHtab.Properties.RowNames = ROInames;
-    
-    
-    writetable(MORPHtab,[Datafilename '.csv'],'WriteRowNames',true)
-    disp('Data saved successfully!')
-    % msgbox('Data saved successfully');
-
-
-    OpenMORPHdataTool = questdlg('Open MORPHX plots?',...
-                                'Open MORPHX plots?',...
-                                'Yes', 'No', 'No');
-                            
-    switch OpenMORPHdataTool
-       case 'Yes'
-            assignin('base','FXdata',MORPHdata)
-            assignin('base','FXdat',MORPHdat)
-            assignin('base','FXcsv',MORPHtab)
-            disp('Welcome to the MORPHXplots toolbox')
-            %edit MORPHXplots.m
-            MORPHXplots(MORPHdata,MORPHdat,MORPHtab,Datafilename)
-            close all
-       case 'No'
-    end
-
-    cd(home);
-
-
-end
-%}
 
 
 end
