@@ -48,9 +48,7 @@ function varargout = neuromorph(varargin)
 
 %% ESTABLISH STARTING PATHS
 clc; close all; clear all; clear java;
-% clearvars -except varargin
 disp('WELCOME TO NEUROMORPH - A NEURON MORPHOLOGY TOOLBOX')
-% set(0,'HideUndocumented','off')
 
 global thisfilepath
 thisfile = 'neuromorph.m';
@@ -83,7 +81,7 @@ global imgpath
 imgpath = '';
 
 %% CD TO DATA DIRECTORY
-
+%{
 if numel(datadir) < 1
     datadir = uigetdir;
 end
@@ -99,7 +97,7 @@ if numel(datafile) < 1
 end
 
 imgpath = [datadir '/' datafile];
-
+%}
 
 %% ESTABLISH GLOBALS AND SET STARTING VALUES
 
@@ -222,9 +220,9 @@ cmmap = [];
 
 
 % mainguih.CurrentCharacter = '+';
-mainguih = figure('Units', 'normalized','Position', [.1 .1 .8 .8], 'BusyAction',...
+mainguih = figure('Units', 'normalized','OuterPosition', [.02 .05 .85 .87], 'BusyAction',...
     'cancel', 'Name', 'Lifetime image', 'Tag', 'lifetime image','Visible', 'Off', ...
-    'KeyPressFcn', {@keypresszoom,1});
+    'KeyPressFcn', {@keypresszoom,1},'Color',[.99 .99 .99],'MenuBar','none','Resize','off');
 
 haxCCD = axes('Parent', mainguih, 'NextPlot', 'Add',...
     'Position', [0.01 0.01 0.60 0.95], 'PlotBoxAspectRatio', [1 1 1], ...
@@ -235,12 +233,12 @@ haxCCD = axes('Parent', mainguih, 'NextPlot', 'Add',...
 
 cmapsliderH = uicontrol('Parent', mainguih, 'Units', 'normalized','Style','slider',...
 	'Max',50,'Min',1,'Value',10,'SliderStep',[.1 .2],...
-	'Position', [0.01 0.96 0.60 0.03], 'Callback', @cmapslider);
+	'Position', [0.02 0.96 0.58 0.03], 'Callback', @cmapslider);
 
 
 
 haxPRE = axes('Parent', mainguih, 'NextPlot', 'replacechildren',...
-    'Position', [0.63 0.03 0.3 0.25]); 
+    'Position', [0.63 0.03 0.36 0.25]); 
 
 axes(haxCCD)
 
@@ -250,23 +248,23 @@ axes(haxCCD)
 %           IMAGE PROCESSING PANEL
 %----------------------------------------------------
 IPpanelH = uipanel('Title','Image Processing','FontSize',10,...
-    'BackgroundColor',[.95 .95 .95],...
-    'Position', [0.62 0.60 0.30 0.39]); % 'Visible', 'Off',
+    'BackgroundColor',[1 1 1],...
+    'Position', [0.62 0.60 0.37 0.39]); % 'Visible', 'Off',
 
 
 getROIH = uicontrol('Parent', IPpanelH, 'Units', 'normalized', ...
     'Position', [0.05 0.80 0.45 0.15], 'FontSize', 11, 'String', 'MEASURE ROI',...
     'Callback', @getROI); 
 
-uicontrol('Parent', IPpanelH, 'Style', 'Text', 'Units', 'normalized',...
-    'Position', [0.68 0.90 0.25 0.10], 'FontSize', 11,'String', 'ROI ID');
+uicontrol('Parent', IPpanelH, 'Style', 'Text', 'Units', 'normalized','BackgroundColor',[.96 .96 .96],...
+    'Position', [0.68 0.91 0.25 0.06], 'FontSize', 12,'String', 'ROI ID');
 ROIIDh = uicontrol('Parent', IPpanelH, 'Style', 'Edit', 'Units', 'normalized', ...
-    'Position', [0.68 0.81 0.25 0.10], 'FontSize', 11); 
+    'Position', [0.68 0.81 0.25 0.10], 'FontSize', 11,'BackgroundColor',[1 1 1]); 
 
 
               
 measureButtonsH = uipanel('Parent', IPpanelH,'Title','Analyses','FontSize',10,...
-    'BackgroundColor',[.95 .95 .95],...
+    'BackgroundColor',[.99 .99 .99],...
     'Position', [0.05 0.15 0.90 0.60]); % 'Visible', 'Off',              
 
 yp = 1 - ((1/6.2) .* (1:6));              
@@ -278,54 +276,69 @@ bpos5 = [0.05 yp(5) 0.95 0.14];
 bpos6 = [0.05 yp(6) 0.95 0.14];
 
 checkbox1H = uicontrol('Parent', measureButtonsH,'Style','checkbox','Units','normalized',...
-    'Position', bpos1 ,'String','Spine Area', 'Value',1);
+    'Position', bpos1 ,'String','Spine Area', 'Value',1,'BackgroundColor',[1 1 1]);
 checkbox2H = uicontrol('Parent', measureButtonsH,'Style','checkbox','Units','normalized',...
-    'Position', bpos2 ,'String','Spine Total Length', 'Value',1);
+    'Position', bpos2 ,'String','Spine Total Length', 'Value',1,'BackgroundColor',[1 1 1]);
 checkbox3H = uicontrol('Parent', measureButtonsH,'Style','checkbox','Units','normalized',...
-    'Position', bpos3 ,'String','Spine Head Diameter', 'Value',1);
+    'Position', bpos3 ,'String','Spine Head Diameter', 'Value',1,'BackgroundColor',[1 1 1]);
 checkbox4H = uicontrol('Parent', measureButtonsH,'Style','checkbox','Units','normalized',...
-    'Position', bpos4 ,'String','Spine Neck Length', 'Value',1);
+    'Position', bpos4 ,'String','Spine Neck Length', 'Value',1,'BackgroundColor',[1 1 1]);
 checkbox5H = uicontrol('Parent', measureButtonsH,'Style','checkbox','Units','normalized',...
-    'Position', bpos5 ,'String','Dendritic Shaft Diameter', 'Value',1);
+    'Position', bpos5 ,'String','Dendritic Shaft Diameter', 'Value',1,'BackgroundColor',[1 1 1]);
 checkbox6H = uicontrol('Parent', measureButtonsH,'Style','checkbox','Units','normalized',...
-    'Position', bpos6 ,'String','Nearest Neighbor Spine', 'Value',1);
+    'Position', bpos6 ,'String','Nearest Neighbor Spine', 'Value',1,'BackgroundColor',[1 1 1]);
 
 
 
 
 savefileh = uicontrol('Parent', IPpanelH, 'Units', 'normalized', ...
-    'Position', [0.05 0.02 0.65 0.10], 'String', 'Save File', 'FontSize', 11,...
+    'Position', [0.05 0.02 0.65 0.10], 'String', 'Save Data', 'FontSize', 11,...
     'Callback', @saveFile);
 
-loadROIh = uicontrol('Parent', IPpanelH, 'Units', 'normalized', ...
-    'Position', [0.70 0.02 0.25 0.10], 'String', 'Load ROIs', 'FontSize', 11,...
-    'Callback', @loadROI);
+loadIMGh = uicontrol('Parent', IPpanelH, 'Units', 'normalized', ...
+    'Position', [0.70 0.02 0.25 0.10], 'String', 'Import Image', 'FontSize', 11,...
+    'Callback', @loadIMG);
 
 
 
+% %----------------------------------------------------
+% %           MEMO CONSOLE GUI WINDOW
+% %----------------------------------------------------
+% 
+% memopanelH = uipanel('Parent', mainguih,'Title','Memo Log ','FontSize',10,...
+%     'BackgroundColor',[.95 .95 .95],...
+%     'Position', [0.62 0.30 0.30 0.29]); % 'Visible', 'Off',
+% 
+% 
+% memos = {' Welcome to Neuromorph', ' ',...
+%          ' Press MEASURE ROI to start', ' ', ...
+%          ' ', ' ', ...
+%          ' ', ' ', ...
+%          ' ', ' '};
+% 
+% memoboxH = uicontrol('Parent',memopanelH,'Style','listbox','Units','normalized',...
+%         'Max',10,'Min',0,'Value',[],'FontSize', 13,'FontName', 'FixedWidth',...
+%         'String',memos,'FontWeight', 'bold',...
+%         'Position',[.05 .05 .90 .90]);  
+ 
 %----------------------------------------------------
 %           MEMO CONSOLE GUI WINDOW
 %----------------------------------------------------
 
 memopanelH = uipanel('Parent', mainguih,'Title','Memo Log ','FontSize',10,...
-    'BackgroundColor',[.95 .95 .95],...
-    'Position', [0.62 0.30 0.30 0.29]); % 'Visible', 'Off',
+    'BackgroundColor',[1 1 1],...
+    'Position', [0.62 0.30 0.37 0.29]); % 'Visible', 'Off',
 
 
-memos = {' Welcome to Neuromorph', ' ',...
-         ' Press MEASURE ROI to start', ' ', ...
-         ' ', ' ', ...
-         ' ', ' ', ...
-         ' ', ' '};
+memes = {' ',' ',' ', ' ',' ',' ',' ', ...
+         'Welcome to the Neuromorph', 'Ready to Import Image!'};
 
-memoboxH = uicontrol('Parent',memopanelH,'Style','listbox','Units','normalized',...
-        'Max',10,'Min',0,'Value',[],'FontSize', 13,'FontName', 'FixedWidth',...
-        'String',memos,'FontWeight', 'bold',...
-        'Position',[.05 .05 .90 .90]);  
-
-
-
-
+conboxH = uicontrol('Parent',memopanelH,'Style','listbox','Units','normalized',...
+        'Max',9,'Min',0,'Value',9,'FontSize', 13,'FontName', 'FixedWidth',...
+        'String',memes,'FontWeight', 'bold',...
+        'Position',[.0 .0 1 1]);  
+    
+memocon('Click the Import Image button above.')
 
 
 %%
@@ -333,7 +346,9 @@ memoboxH = uicontrol('Parent',memopanelH,'Style','listbox','Units','normalized',
 %     IMPORT IMAGE & LOAD DEFAULT TOOLBOX PARAMETERS
 %----------------------------------------------------
 
-loadfile()
+% loadfile()
+
+set(mainguih, 'Visible', 'On');
 
 axes(haxCCD)
 
@@ -444,13 +459,14 @@ end
 function MORPHOa(ROInum)
 
 
-    % ------  
-    disp('Draw outline around entire spine')
-    memos(1:end-1) = memos(2:end);
-    memos{end} = 'Draw outline around entire spine';
-    memoboxH.String = memos;
-    pause(.02)
-    % ------
+%     % ------  
+%     disp('Draw outline around entire spine')
+%     memos(1:end-1) = memos(2:end);
+%     memos{end} = 'Draw outline around entire spine';
+%     memoboxH.String = memos;
+%     pause(.02)
+%     % ------
+    memocon('Draw outline around entire spine.')
     
     
     hROI = imfreehand(haxCCD);
@@ -485,13 +501,14 @@ end
 %----------------------------------------------------
 function MORPHOb(ROInum)
 
-    % ------  
-    disp('Draw line from dendritic shaft to spine tip (longest extent of spine)')
-    memos(1:end-1) = memos(2:end);
-    memos{end} = 'Draw line from spine head tip to dendrite';
-    memoboxH.String = memos;
-    pause(.02)
-    % ------
+%     % ------  
+%     disp('Draw line from dendritic shaft to spine tip (longest extent of spine)')
+%     memos(1:end-1) = memos(2:end);
+%     memos{end} = 'Draw line from spine head tip to dendrite';
+%     memoboxH.String = memos;
+%     pause(.02)
+%     % ------
+    memocon('Draw line from spine tip to dendrite shaft.')
     
 	hline = imline(haxCCD);
 	dpos = hline.getPosition(); 
@@ -535,13 +552,7 @@ end
 %----------------------------------------------------
 function MORPHOc(ROInum)
     
-    % ------  
-    disp('Draw line across spine-head parallel to dendritic shaft')
-    memos(1:end-1) = memos(2:end);
-    memos{end} = 'Draw line across spine-head width';
-    memoboxH.String = memos;
-    pause(.02)
-    % ------
+    memocon('Draw line across spine head width.')
     
 	hline = imline(haxCCD);
 	dpos = hline.getPosition(); 
@@ -583,13 +594,7 @@ end
 %----------------------------------------------------
 function MORPHOd(ROInum)
     
-    % ------
-    disp('Draw line along length of spine neck')
-    memos(1:end-1) = memos(2:end);
-    memos{end} = 'Draw line along length of spine neck';
-    memoboxH.String = memos;
-    pause(.02)
-    % ------
+    memocon('Draw line across spine neck width.')
     
 	hline = imline(haxCCD);
 	dpos = hline.getPosition(); 
@@ -630,13 +635,8 @@ end
 %        QUANTIFY Dendritic Shaft Diameter
 %----------------------------------------------------
 function MORPHOe(ROInum)
-
-    disp('Draw line across dendrite region adjacent to spine')
-    memos(1:end-1) = memos(2:end);
-    memos{end} = 'Draw line across dendrite diameter connecting to spine';
-    memoboxH.String = memos;
-    pause(.02)
-    % ------
+    
+    memocon('Draw line to measure dendrite width near spine')
 
 	hline = imline(haxCCD);
 	dpos = hline.getPosition(); 
@@ -680,14 +680,8 @@ end
 %        QUANTIFY Nearest Neighbor Spine
 %----------------------------------------------------
 function MORPHOf(ROInum)
-    
-    % ------
-    disp('Connect line from this spine to nearest spine ')
-    memos(1:end-1) = memos(2:end);
-    memos{end} = ' Connect line from ROI spine to nearest spine';
-    memoboxH.String = memos;
-    pause(.02)
-    % ------
+        
+    memocon('Draw line from this spine to nearest spine.')
     
 	hline = imline(haxCCD);
 	dpos = hline.getPosition(); 
@@ -821,11 +815,17 @@ end
 %----------------------------------------------------
 %        LOAD FILE
 %----------------------------------------------------
-function loadfile()
-%Load file triggers uiresume; the initial menu is set to invisible. Prompts
-%user for file to load, copies the datastack from the file; sets the image 
-%windows to visible, and plots the images.
+function loadIMG(loadIMGh, eventData)
 
+
+    if numel(datafile) < 1
+        [datafile,datadir,~] = uigetfile('*.tif*; *.bmp');
+    end
+    cd(datadir);
+    imgpath = [datadir '/' datafile];
+    
+    memocon('Working dir changed to: ')
+    memocon(datadir)
     
     iminfo = imfinfo(imgpath);
     [im, map] = imread(imgpath);
@@ -856,12 +856,6 @@ function loadfile()
 
     end
     
-    
-    
-    
-
-    set(mainguih, 'Visible', 'On');
-
     
     axes(haxCCD)
     colormap(haxCCD,bone); % parula
@@ -895,6 +889,11 @@ function loadfile()
     %----------------------------------------------------
     % axes(haxCCD)
     
+    memocon('Finished loading image.')
+    memocon('Click on the image to make it active.')
+    memocon('Use the =/- keys to zoom in and out')
+    memocon('Use s d f e keys to move left down right up')
+    memocon('Click MEASURE ROI to begin.')
     
 end
 
@@ -908,47 +907,10 @@ end
 function saveFile(savefileh, eventData)
     
     
-    % prepForSave(savefileh, eventData)
-    
-
-    cd(datadir);
-
     saveDatafilename = inputdlg('Enter a filename to save data','file name',1,...
                                 {datafile(1:end-4)});
 
     Datafilename = char(strcat(saveDatafilename));
-    
-%{    
-% SPINE    % MORPHdata{1,1}
-% area: 349.0402
-% intensity: 0.5744                     
-
-
-% SPINEHN  % MORPHdata{1,2}
-% spineextent: 26.4981
-% spineextentintensity: 0.6986
-% spineextentintensityprofile: [26x1 double]
-% spineextentcenter: [108.4859 119.9637]
-% headwidth: 17.7264
-% headintensity: 0.5338
-% headintensityprofile: [18x1 double]
-% headcenter: [108.0432 123.1734]
-% necklength: 6.0418
-% neckintensity: 0.7196
-% neckintensityprofile: [6x1 double]
-% neckcenter: [109.9247 109.5600]
-
-
-% DENDRITE  % MORPHdata{1,3}
-% size: 21.7887
-% intensity: 0.8098
-% intensityprofile: [22x1 double]
-% center: [112.9130 97.0534]
-% nearestspine: 36.8842
-% nearestspineint: 0.9783
-% nearestspineprofile: [37x1 double]
-% nearestspinecenter: [129.0720 105.9076]    
-%}
     
     
 MORPHdata = MORPHdata(~cellfun(@isempty, MORPHdata));
@@ -985,8 +947,6 @@ MORPHdata = MORPHdata(~cellfun(@isempty, MORPHdata));
     
     MORPHtab.Properties.RowNames = ROInames;
     
-    
-    
     MORPHtab.FILE = repmat(datafile,size(MORPHdata,2),1);
     % MORPHtab.DATE = repmat(datadate,size(MORPHdata,2),1);
     
@@ -994,11 +954,9 @@ MORPHdata = MORPHdata(~cellfun(@isempty, MORPHdata));
     writetable(MORPHtab,[Datafilename '.csv'],'WriteRowNames',true)
     save([Datafilename '.mat'],'MORPHdata','ROISAVES')
     
-    disp('Data saved successfully!')
-    % msgbox('Data saved successfully');
-
-    cd(home);
-
+    memocon('Data saved to: ')
+    memocon(datadir)
+    memocon([Datafilename '.csv'])
 
 end
 
@@ -1095,6 +1053,70 @@ function loadROI(hObject, eventdata)
 %     ROISAVES.SpineNearPos
 
 
+
+end
+
+
+
+
+
+
+%----------------------------------------------------
+%        MEMO LOG UPDATE
+%----------------------------------------------------
+function memocon(spf,varargin)
+    
+  
+    if iscellstr(spf)
+        spf = [spf{:}];
+    end
+    
+    if iscell(spf)
+        return
+        keyboard
+        spf = [spf{:}];
+    end
+    
+    if ~ischar(spf)
+        return
+        keyboard
+        spf = [spf{:}];
+    end
+    
+    
+
+    memes(1:end-1) = memes(2:end);
+    memes{end} = spf;
+    conboxH.String = memes;
+    pause(.02)
+    
+    if nargin == 3
+        
+        vrs = deal(varargin);
+                
+        memi = memes;
+                 
+        memes(1:end) = {' '};
+        memes{end-1} = vrs{1};
+        memes{end} = spf;
+        conboxH.String = memes;
+        
+        conboxH.FontAngle = 'italic';
+        conboxH.ForegroundColor = [.9 .4 .01];
+        pause(vrs{2})
+        
+        conboxH.FontAngle = 'normal';
+        conboxH.ForegroundColor = [0 0 0];
+        conboxH.String = memi;
+        pause(.02)
+        
+    elseif nargin == 2
+        vrs = deal(varargin);
+        pause(vrs{1})
+    end
+    
+    
+    disp(spf)
 
 end
 
